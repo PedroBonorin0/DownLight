@@ -3,8 +3,8 @@ export default function Home() {
     <div className="px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <img
-          className="mx-auto h-24 w-auto rounded-full"
-          src="company.jpg"
+          className="mx-auto h-48 w-auto rounded-full"
+          src="company.svg"
           alt="Your Company"
         />
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
@@ -12,7 +12,7 @@ export default function Home() {
         </h2>
       </div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-xs">
         <form className="space-y-6" action="#" method="POST">
           <div>
             <label
