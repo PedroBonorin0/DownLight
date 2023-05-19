@@ -1,5 +1,12 @@
--- AlterTable
-ALTER TABLE "Service" ADD COLUMN     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+-- CreateTable
+CREATE TABLE "Service" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "price" DECIMAL(5,2) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Service_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -7,6 +14,7 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "avatar_url" TEXT NOT NULL,
     "admin" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

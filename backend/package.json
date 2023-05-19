@@ -4,28 +4,29 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon"
+    "dev": "tsx watch src/server.ts",
+    "start": "node build/server.js",
+    "build": "tsup src --out-dir build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/express": "^4.17.1",
-    "@types/node": "^20.1.4",
-    "@typescript-eslint/eslint-plugin": "^5.59.5",
-    "@typescript-eslint/parser": "^5.59.5",
-    "eslint": "^8.40.0",
-    "eslint-plugin-react": "^7.32.2",
-    "nodemon": "^2.0.22",
-    "prisma": "^4.14.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "@rocketseat/eslint-config": "1.2.0",
+    "@types/bcryptjs": "2.4.2",
+    "@types/node": "20.2.1",
+    "eslint": "8.40.0",
+    "prisma": "4.14.1",
+    "tsup": "6.7.0",
+    "tsx": "3.12.7",
+    "typescript": "5.0.4"
   },
   "dependencies": {
-    "@prisma/client": "^4.14.0",
-    "body-parser": "^1.20.2",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2"
+    "@fastify/jwt": "6.7.1",
+    "@prisma/client": "4.14.1",
+    "bcryptjs": "2.4.3",
+    "dotenv": "16.0.3",
+    "fastify": "4.17.0",
+    "zod": "3.21.4"
   }
 }
