@@ -9,7 +9,7 @@ datasource db {
 
 model Service {
   id         String   @id @default(uuid())
-  name       String
+  name       String   @unique
   price      Decimal  @db.Decimal(5, 2)
   created_at DateTime @default(now())
 }
