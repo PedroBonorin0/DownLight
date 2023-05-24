@@ -1,7 +1,8 @@
+import AuthProvider from "../components/AuthProvider";
 import "./globals.css";
 import { Roboto } from "next/font/google";
 
-const roboto = Roboto({ subsets: ["latin"], weight: ["400", "700"] });
+const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
 
 export const metadata = {
   title: "Create Next App",
@@ -15,10 +16,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${roboto.className} flex h-screen flex-col  justify-center`}
-      >
-        {children}
+      <body className={`${roboto.className} flex h-screen flex-col`}>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

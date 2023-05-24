@@ -5,7 +5,7 @@ export function verifyUserRole(roleToVerify: "ADMIN" | "MEMBER") {
     const { role } = request.user;
 
     if (role !== roleToVerify) {
-      return reply.status(401).send({ message: "Unauthorized" });
+      return reply.status(403).send({ message: "Forbidden" });
     }
   };
 }
