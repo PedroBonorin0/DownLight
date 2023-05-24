@@ -29,9 +29,7 @@ export const authOptions: NextAuthOptions = {
           });
           const { user } = await res.json();
           if (res.ok && user) {
-            backend.defaults.headers.common[
-              "Authorization"
-            ] = `Bearer ${token}`;
+            user.accessToken = token;
             return user;
           }
           return null;
@@ -43,7 +41,9 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       const teste = { ...token, ...user };
-
+      backend.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token.accessToken}`;
       return teste;
     },
     async session({ session, token }) {
