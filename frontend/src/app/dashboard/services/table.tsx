@@ -1,5 +1,8 @@
+import { Button } from "@/components/Button";
 import { Service } from "@/interfaces/Service";
 import { backend } from "@/lib/axios";
+import { deleteService } from "@/serverActions/services";
+import Link from "next/link";
 
 export async function Table() {
   const services: Service[] = (await backend.get("/services")).data;
@@ -47,8 +50,8 @@ export async function Table() {
             </td>
             <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
               <div className="flex">
-                <button className="mr-1">edit</button>
-                <button>delete</button>
+                <Link replace href={`/dashboard/services?name=${service.name}&price=${service.price}`}><Button text="edit" color="green"/></Link>
+                <Button text="delete" color="red"/>
               </div>
             </td>
           </tr>
