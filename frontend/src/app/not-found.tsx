@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <div>
-      <div>Page not found</div>
+      <div>Pagina customizada 404!</div>
     </div>
   );
 }

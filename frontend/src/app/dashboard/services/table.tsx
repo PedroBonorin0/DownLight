@@ -1,71 +1,59 @@
-'use client';
+import { Service } from "@/interfaces/Service";
+import { backend } from "@/lib/axios";
 
-import { Service } from "@/app/interfaces/Service";
-import { useState } from "react";
-
-interface Props {
-  services: Service[];
-  editService: Function;
-}
-
-export default function Table(props: Props) {
-  const servicesList = props.services.map((ser: Service, index: number) => {
-    return (
-      <tr key={ser.id} className="even:bg-slate-100">
-        <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
-          {index + 1}
-        </td>
-        <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-          {ser.name}
-        </td>
-        <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-          R${ser.price}
-        </td>
-        <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-          <div
-            className="flex"
-          >
-            <button onClick={() => props.editService(ser)} className="mr-1">edit</button>
-            <button>delete</button>
-          </div>
-        </td>
-      </tr>
-    )
-  });
-
+export async function Table() {
+  const services: Service[] = (await backend.get("/services")).data;
   return (
-    <div className="flex flex-col">
-      <div className="overflow-x-auto">
-        <div className="p-1.5 w-full inline-block align-middle">
-          <div className="overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="border-b">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-                  >ID</th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-                  >Nome</th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-                  >Preco</th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-xs font-bold text-right text-gray-500 uppercase "
-                  >Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                  {servicesList}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+    <table className="min-w-full divide-y divide-gray-200">
+      <thead className="border-b">
+        <tr>
+          <th
+            scope="col"
+            className="px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 "
+          >
+            ID
+          </th>
+          <th
+            scope="col"
+            className="px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 "
+          >
+            Nome
+          </th>
+          <th
+            scope="col"
+            className="px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 "
+          >
+            Preco
+          </th>
+          <th
+            scope="col"
+            className="px-6 py-3 text-right text-xs font-bold uppercase text-gray-500 "
+          >
+            Ações
+          </th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-gray-200">
+        {services.map((service, index) => (
+          <tr key={service.id} className="even:bg-slate-100">
+            <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800">
+              {index + 1}
+            </td>
+            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-800">
+              {service.name}
+            </td>
+            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-800">
+              R${service.price}
+            </td>
+            <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+              <div className="flex">
+                <button className="mr-1">edit</button>
+                <button>delete</button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }

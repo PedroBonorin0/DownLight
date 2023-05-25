@@ -1,23 +1,28 @@
-import Table from "./table";
-import { Service } from "@/app/interfaces/Service";
-import { backend } from "@/app/lib/axios";
+import { Service } from "@/interfaces/Service";
+import { Suspense } from "react";
+import { Table } from "./table";
+import { DocumentDuplicate } from "@/components/Icons/DocumentDuplicate";
 
-export default async function Service() {
-  const services = (await backend.get('/services')).data;
-
-  const editService = async(sv: Service) => {
-    'use server';
-    
-    await backend.put(`/services/${sv.id}`, {name: sv.name, price: sv.price});
-  };
-
+export default function Service() {
   return (
     <div>
-      <h1 className="text-4xl mb-8">
+      <h1 className=" mb-8 flex items-center gap-5 text-4xl text-gray-700">
+        <DocumentDuplicate className="h-9 w-9 text-gray-500" />
         Serviços
       </h1>
       <div className="flex flex-col">
-        <Table services={services} editService={editService}></Table>
+        <div className="flex flex-col">
+          <div className="overflow-x-auto">
+            <div className="inline-block w-full p-1.5 align-middle">
+              <div className="overflow-hidden">
+                <Suspense fallback={<div>loading...</div>}>
+                  {/* @ts-expect-error Async Server Component */}
+                  <Table />
+                </Suspense>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
