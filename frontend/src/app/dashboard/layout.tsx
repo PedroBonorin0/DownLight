@@ -6,8 +6,6 @@ import { Stack } from "@/components/Icons/Stack";
 import { Users } from "@/components/Icons/Users";
 import { MenuItem } from "@/components/MenuItem";
 import { UserCard } from "@/components/UserCard";
-import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
 import { Suspense } from "react";
 
 export default function DashboardLayout({
@@ -25,12 +23,32 @@ export default function DashboardLayout({
             </div>
             <ul className="space-y-2 font-medium">
               <li>
-                <MenuItem title="Dashboard" icon={<Home />} />
-                <MenuItem title="Funcionários" icon={<Users />} />
-                <MenuItem title="Estoque" icon={<Stack />} />
-                <MenuItem title="Serviços" icon={<DocumentDuplicate />} />
-                <MenuItem title="Relatório" icon={<ChartPie />} />
-                <MenuItem title="Configurações" icon={<Settings />} />
+                <MenuItem title="Dashboard" icon={<Home />} href="/dashboard" />
+                <MenuItem
+                  title="Funcionários"
+                  icon={<Users />}
+                  href="/dashboard/employees"
+                />
+                <MenuItem
+                  title="Estoque"
+                  icon={<Stack />}
+                  href="/dashboard/stock"
+                />
+                <MenuItem
+                  title="Serviços"
+                  icon={<DocumentDuplicate className="h-6 w-6" />}
+                  href="/dashboard/services"
+                />
+                <MenuItem
+                  title="Relatório"
+                  icon={<ChartPie />}
+                  href="/dashboard/report"
+                />
+                <MenuItem
+                  title="Configurações"
+                  icon={<Settings />}
+                  href="/dashboard/settings"
+                />
               </li>
             </ul>
           </div>
