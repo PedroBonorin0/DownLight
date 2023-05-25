@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { backend } from "@/app/lib/axios";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -12,7 +13,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Senha", type: "password" },
       },
       async authorize(credentials, _req) {
-        const res = await fetch("http://localhost:3333/sessions", {
+        const res = await fetch(`${process.env.API_GATEWAY}/sessions`, {
           method: "POST",
           body: JSON.stringify(credentials),
           headers: { "Content-Type": "application/json" },
@@ -20,7 +21,7 @@ export const authOptions: NextAuthOptions = {
         const { token } = await res.json();
 
         if (res.ok && token) {
-          const res = await fetch("http://localhost:3333/me", {
+          const res = await fetch(`${process.env.API_GATEWAY}/me`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",

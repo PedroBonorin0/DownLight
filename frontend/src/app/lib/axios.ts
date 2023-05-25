@@ -1,8 +1,9 @@
+import "dotenv/config";
 import axios from "axios";
 import { redirect } from "next/navigation";
 
 export const backend = axios.create({
-  baseURL: "http://localhost:3333/",
+  baseURL: process.env.API_GATEWAY || 'http://127.0.0.1:3333',
 });
 
 backend.interceptors.response.use(
