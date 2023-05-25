@@ -3,20 +3,20 @@ import { FieldError } from "react-hook-form";
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   id: string;
-  label: string;
+  label?: string;
   error?: FieldError;
-  forwardRef: ForwardedRef<HTMLInputElement>;
+  forwardRef?: ForwardedRef<HTMLInputElement>;
 }
 
 export function Input({ id, label, error, forwardRef, ...rest }: Props) {
   return (
     <div>
-      <label
+      {label && <label
         htmlFor={id}
         className="block text-sm font-medium leading-6 text-gray-900"
       >
         {label}
-      </label>
+      </label>}
       <div className="mt-2">
         <input
           ref={forwardRef}
