@@ -1,5 +1,4 @@
 import { Service } from "@/interfaces/Service";
-import { Suspense } from "react";
 import { DocumentDuplicate } from "@/components/Icons/DocumentDuplicate";
 import { Form } from "./Form";
 import { Table } from "./Table";
@@ -18,10 +17,7 @@ export default function Service() {
           <div className="inline-block w-full p-1.5 align-middle">
             <Form />
             <div className="overflow-hidden">
-              <Suspense fallback={<div>loading...</div>}>
-                {/* @ts-expect-error Async Server Component */}
-                <Table />
-              </Suspense>
+              <Table />
             </div>
           </div>
         </div>

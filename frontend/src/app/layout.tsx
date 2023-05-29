@@ -1,3 +1,4 @@
+import QueryProvider from "@/components/QueryProvider";
 import AuthProvider from "../components/AuthProvider";
 import "./globals.css";
 import { Roboto } from "next/font/google";
@@ -17,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${roboto.className} flex h-screen flex-col`}>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <QueryProvider>{children}</QueryProvider>
+        </AuthProvider>
       </body>
     </html>
   );

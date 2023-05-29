@@ -2,7 +2,8 @@
 
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
-import { useServiceStore } from "@/hooks/service-store";
+import { useQueryService } from "@/hooks/useQueryService";
+import { useServiceStore } from "@/hooks/useServiceStore";
 import { backend } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -10,6 +11,8 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
 export function Form() {
+  const { refetch } = useQueryService();
+
   const service = useServiceStore((state) => state.service);
   const clear = useServiceStore((state) => state.clear);
   const [loading, setLoading] = useState(false);
@@ -28,16 +31,21 @@ export function Form() {
   async function onSubmit(data: ServiceData) {
     setLoading(true);
     if (service.id) {
-      console.log("Editar");
+      await backend
+        .put(`/services/${service.id}`, {
+          name: data.name,
+          price: Number(data.price),
+        })
+        .catch((err) => alert(err.data.message))
+        .then(() => refetch());
     } else {
-      console.log("Cadastrar");
-
       await backend
         .post("/services", {
           name: data.name,
           price: Number(data.price),
         })
-        .catch((err) => alert(err.data.message));
+        .catch((err) => alert(err.data.message))
+        .then(() => refetch());
     }
     setLoading(false);
   }
@@ -83,7 +91,7 @@ export function Form() {
 
       <div className="flex items-end gap-2">
         <Button
-          text="Salvar"
+          text={service.id ? "Salvar" : "Cadastrar"}
           type="submit"
           disabled={loading}
           loading={loading}
