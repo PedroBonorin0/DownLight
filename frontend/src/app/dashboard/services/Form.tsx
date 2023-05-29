@@ -11,11 +11,10 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
 export function Form() {
-  const { refetch } = useQueryService();
+  const { refetch, isFetching } = useQueryService();
 
   const service = useServiceStore((state) => state.service);
   const clear = useServiceStore((state) => state.clear);
-  const [loading, setLoading] = useState(false);
 
   const ServiceSchema = z.object({
     name: z.string().min(4),
@@ -29,7 +28,6 @@ export function Form() {
   });
 
   async function onSubmit(data: ServiceData) {
-    setLoading(true);
     if (service.id) {
       await backend
         .put(`/services/${service.id}`, {
@@ -37,7 +35,11 @@ export function Form() {
           price: Number(data.price),
         })
         .catch((err) => alert(err.data.message))
-        .then(() => refetch());
+        .then(() => {
+          refetch();
+          reset();
+          clear();
+        });
     } else {
       await backend
         .post("/services", {
@@ -45,9 +47,11 @@ export function Form() {
           price: Number(data.price),
         })
         .catch((err) => alert(err.data.message))
-        .then(() => refetch());
+        .then(() => {
+          refetch();
+          reset();
+        });
     }
-    setLoading(false);
   }
 
   useEffect(() => {
@@ -93,8 +97,7 @@ export function Form() {
         <Button
           text={service.id ? "Salvar" : "Cadastrar"}
           type="submit"
-          disabled={loading}
-          loading={loading}
+          disabled={isFetching}
         />
         {service.name !== "" && (
           <Button text="Cancelar" color="gray" onClick={clear} type="button" />
