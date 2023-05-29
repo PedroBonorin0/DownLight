@@ -2,7 +2,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Input } from "./Input";
+import { Input } from "../../../components/Input";
 import { signIn } from "next-auth/react";
 
 export function Form() {
