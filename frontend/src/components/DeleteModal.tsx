@@ -24,7 +24,7 @@ export function DeleteModal({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-gray-700 opacity-30" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-md -translate-x-2/4 -translate-y-2/4 rounded-md bg-white p-6 shadow-lg ">
+        <Dialog.Content className="fixed left-[50%] top-[50%] max-h-[85vh] w-[90vw] max-w-md -translate-x-[50%] -translate-y-[50%] rounded-md bg-white p-6 shadow-lg ">
           <Dialog.Title className="m-0 text-lg font-semibold text-gray-800">
             {title + " " + serviceSelected.name}
           </Dialog.Title>

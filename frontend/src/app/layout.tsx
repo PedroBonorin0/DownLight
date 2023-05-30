@@ -1,6 +1,7 @@
 import QueryProvider from "@/components/QueryProvider";
 import AuthProvider from "../components/AuthProvider";
 import "./globals.css";
+import "react-toastify/dist/ReactToastify.css";
 import { Roboto } from "next/font/google";
 
 const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });

@@ -5,7 +5,7 @@ import { ServicesRepository } from "../services-repository";
 export class PrismaServicesRepository implements ServicesRepository {
   async findAll() {
     const allServices = await prisma.service.findMany({
-      orderBy: { created_at: "asc" },
+      orderBy: { created_at: "desc" },
     });
 
     return allServices;

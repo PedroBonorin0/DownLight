@@ -1,14 +1,25 @@
 "use client";
 
-import { ReactNode } from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
-interface Props {
-  children: ReactNode;
-}
-const queryClient = new QueryClient();
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { PropsWithChildren, useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-export default function QueryProvider({ children }: Props) {
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+export default function QueryProvider({ children }: PropsWithChildren) {
+  const [client] = useState(
+    new QueryClient({ defaultOptions: { queries: { staleTime: 5000 } } })
   );
+
+  return (
+    <QueryClientProvider client={client}>
+      {children}
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
+  // const queryClient = new QueryClient();
+  // return (
+  //   <QueryClientProvider client={queryClient}>
+  //     {children}
+  //     <ReactQueryDevtools initialIsOpen={false} />
+  //   </QueryClientProvider>
+  // );
 }

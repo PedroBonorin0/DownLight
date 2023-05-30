@@ -2,7 +2,6 @@ import { create } from "zustand";
 
 interface ServiceState {
   service: { name: string; price: string; id: string | undefined };
-
   clear: () => void;
   setService: (name: string, price: string, id: string) => void;
 }

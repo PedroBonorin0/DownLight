@@ -1,7 +1,7 @@
 import { Service } from "@/interfaces/Service";
 import { backend } from "@/lib/axios";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 interface FormattedService extends Service {
   formattedPrice: string;
