@@ -27,9 +27,9 @@ export default function Service() {
       </div>
       <div className="flex flex-col">
         <div className="overflow-x-auto">
-          <div className="inline-block w-full p-1.5 align-middle">
+          <div className="inline-block w-full align-middle">
             <Form />
-            <div className="overflow-hidden">
+            <div className="mt-5 max-h-[660px] w-3/5 overflow-auto">
               <Table />
             </div>
           </div>

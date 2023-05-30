@@ -9,11 +9,49 @@ import { useState } from "react";
 import { backend } from "@/lib/axios";
 import { Input } from "@/components/Input";
 import { Check } from "@/components/Icons/Check";
+import { X } from "@/components/Icons/X";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ControlledInput } from "@/components/ControlledInput";
 
 export function Table() {
   const state = useServiceStore();
-  const { data: services, isLoading, refetch } = useQueryService();
+  const { data: services, isLoading, refetch, isFetching } = useQueryService();
 
+  const ServiceSchema = z.object({
+    name: z.string().min(4),
+    price: z.string().min(1),
+  });
+
+  type ServiceData = z.infer<typeof ServiceSchema>;
+
+  const {
+    control,
+    reset,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ServiceData>({
+    resolver: zodResolver(ServiceSchema),
+  });
+
+  async function onSubmit(data: ServiceData) {
+    console.log(data);
+    await backend
+      .put(`/services/${state.service.id}`, {
+        name: data.name,
+        price: Number(data.price),
+      })
+      .catch((err) => {
+        return alert(err.data.message);
+      })
+      .then(() => {
+        refetch().then(() => {
+          state.clear();
+          reset();
+        });
+      });
+  }
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [serviceSelected, setServiceSelected] = useState({
     name: "",
@@ -36,7 +74,7 @@ export function Table() {
 
   return (
     <>
-      <table className="w-3/5 ">
+      <table className=" w-full ">
         <thead>
           <tr>
             <th
@@ -71,41 +109,57 @@ export function Table() {
           ) : (
             services?.map(({ id, name, price, formattedPrice }, index) => (
               <tr key={id} className="odd:bg-gray-50">
-                <td className="text-md whitespace-nowrap  rounded-s-lg  font-medium text-gray-800">
+                <td className="text-md whitespace-nowrap rounded-s-lg  px-6  font-medium text-gray-800">
                   {index + 1}
                 </td>
                 <td className="text-md whitespace-nowrap  text-gray-800">
                   {state.service.id === id ? (
-                    <Input id="name" value={name} />
+                    <ControlledInput
+                      id={name}
+                      defaultValue={name}
+                      placeholder="Name"
+                      name="name"
+                      control={control}
+                    />
                   ) : (
-                    name
+                    <Input id="name" value={name} disabled />
                   )}
                 </td>
                 <td className="text-md whitespace-nowrap text-gray-800">
                   {state.service.id === id ? (
-                    <Input id="price" value={price} />
+                    <ControlledInput
+                      id={`${name}:price`}
+                      defaultValue={price.toString()}
+                      placeholder="Preço"
+                      name="price"
+                      control={control}
+                    />
                   ) : (
                     <Input id="price" value={formattedPrice} disabled />
                   )}
                 </td>
-                <td className="text-md whitespace-nowrap rounded-e-lg py-4 font-medium">
+                <td className="text-md whitespace-nowrap rounded-e-lg px-3 py-4 font-medium">
                   <div className="flex justify-center gap-5 text-gray-500 ">
                     {state.service.id === id ? (
                       <>
                         <button
-                          className="cursor-pointer text-green-700 hover:text-green-500"
+                          className="cursor-pointer text-green-700 hover:text-green-500 disabled:cursor-progress disabled:opacity-70"
                           type="button"
-                          onClick={() => state.clear()}
+                          onClick={handleSubmit(onSubmit)}
+                          disabled={isFetching}
                         >
                           <Check />
                         </button>
 
                         <button
-                          className="cursor-pointer hover:text-red-700"
+                          className="cursor-pointer text-gray-500 hover:text-gray-600"
                           type="button"
-                          onClick={() => handleDeleteClick({ name, id })}
+                          onClick={() => {
+                            state.clear();
+                            reset();
+                          }}
                         >
-                          <Trash />
+                          <X />
                         </button>
                       </>
                     ) : (
@@ -113,9 +167,10 @@ export function Table() {
                         <button
                           className="cursor-pointer hover:text-blue-700"
                           type="button"
-                          onClick={() =>
-                            state.setService(name, price.toString(), id)
-                          }
+                          onClick={() => {
+                            state.setService(name, price.toString(), id);
+                            reset();
+                          }}
                         >
                           <Pencil />
                         </button>
