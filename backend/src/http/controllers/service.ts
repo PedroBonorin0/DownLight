@@ -1,13 +1,17 @@
-import { PrismaServicesRepository } from '@/repositories/prisma/prisma-services-repository';
-import { CreateServiceUseCase } from '@/use-cases/create-service';
-import { GetAllServicesUseCase } from '@/use-cases/get-all-services';
-import { EditServiceUseCase } from '@/use-cases/edit-service';
-import { DeleteServiceUseCase } from '@/use-cases/delete-service';
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { z } from 'zod';
-import { UserAlreadyExistsError } from '@/use-cases/errors/user-already-exists-error';
+import { PrismaServicesRepository } from "@/repositories/prisma/prisma-services-repository";
+import { CreateServiceUseCase } from "@/use-cases/create-service";
+import { GetAllServicesUseCase } from "@/use-cases/get-all-services";
+import { EditServiceUseCase } from "@/use-cases/edit-service";
+import { DeleteServiceUseCase } from "@/use-cases/delete-service";
+import { FastifyRequest, FastifyReply } from "fastify";
+import { z } from "zod";
+import { UserAlreadyExistsError } from "@/use-cases/errors/user-already-exists-error";
+import { ServiceAlreadyExistsError } from "@/use-cases/errors/service-already-exists-error";
 
-export async function listAllServices(_request: FastifyRequest, reply: FastifyReply) {
+export async function listAllServices(
+  _request: FastifyRequest,
+  reply: FastifyReply
+) {
   const servicesRepository = new PrismaServicesRepository();
   const getAllServicesUseCase = new GetAllServicesUseCase(servicesRepository);
 
@@ -16,15 +20,16 @@ export async function listAllServices(_request: FastifyRequest, reply: FastifyRe
   return reply.status(200).send(services);
 }
 
-export async function createService(request: FastifyRequest, reply: FastifyReply) {
+export async function createService(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
   const createServiceBodySchema = z.object({
     name: z.string(),
-    price: z.number()
+    price: z.number(),
   });
 
-  const { name, price } = createServiceBodySchema.parse(
-    request.body
-  );
+  const { name, price } = createServiceBodySchema.parse(request.body);
 
   try {
     const servicesRepository = new PrismaServicesRepository();
@@ -32,10 +37,10 @@ export async function createService(request: FastifyRequest, reply: FastifyReply
 
     await createServiceUseCase.execute({
       name,
-      price
+      price,
     });
   } catch (err) {
-    if (err instanceof UserAlreadyExistsError) { // fix me lol
+    if (err instanceof ServiceAlreadyExistsError) {
       return reply.status(409).send({ message: err.message });
     }
     throw err;
@@ -44,23 +49,22 @@ export async function createService(request: FastifyRequest, reply: FastifyReply
   return reply.status(201).send();
 }
 
-export async function editService(request: FastifyRequest, reply: FastifyReply) {
+export async function editService(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
   const editServiceBodySchema = z.object({
     name: z.string(),
-    price: z.number()
+    price: z.number(),
   });
 
   const editServiceParamsSchema = z.object({
-    id: z.string()
+    id: z.string(),
   });
 
-  const { name, price } = editServiceBodySchema.parse(
-    request.body
-  );
+  const { name, price } = editServiceBodySchema.parse(request.body);
 
-  const { id } = editServiceParamsSchema.parse(
-    request.params
-  );
+  const { id } = editServiceParamsSchema.parse(request.params);
 
   try {
     const servicesRepository = new PrismaServicesRepository();
@@ -69,10 +73,10 @@ export async function editService(request: FastifyRequest, reply: FastifyReply) 
     await editServiceUseCase.execute({
       name,
       price,
-      id
+      id,
     });
   } catch (err) {
-    if (err instanceof UserAlreadyExistsError) { // fix me lol
+    if (err instanceof ServiceAlreadyExistsError) {
       return reply.status(409).send({ message: err.message });
     }
     throw err;
@@ -81,24 +85,26 @@ export async function editService(request: FastifyRequest, reply: FastifyReply) 
   return reply.status(201).send();
 }
 
-export async function deleteService(request: FastifyRequest, reply: FastifyReply) {
+export async function deleteService(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
   const deleteServiceParamsSchema = z.object({
-    id: z.string()
+    id: z.string(),
   });
 
-  const { id } = deleteServiceParamsSchema.parse(
-    request.params
-  );
+  const { id } = deleteServiceParamsSchema.parse(request.params);
 
   try {
     const servicesRepository = new PrismaServicesRepository();
     const deleteServiceUseCase = new DeleteServiceUseCase(servicesRepository);
 
     await deleteServiceUseCase.execute({
-      id
+      id,
     });
   } catch (err) {
-    if (err instanceof UserAlreadyExistsError) { // fix me lol
+    if (err instanceof UserAlreadyExistsError) {
+      // fix me lol
       return reply.status(409).send({ message: err.message });
     }
     throw err;

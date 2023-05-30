@@ -1,3 +1,26 @@
 @tailwind base;
+
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-black/5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-black/20;
+}
+
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --primary: #f3f4f6;
+  --secondary: #2563eb;
+}

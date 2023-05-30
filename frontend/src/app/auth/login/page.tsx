@@ -1,6 +1,6 @@
 "use client";
 import { signOut } from "next-auth/react";
-import { Form } from "../../../components/Form";
+import { Form } from "./Form";
 
 interface Props {
   searchParams?: {

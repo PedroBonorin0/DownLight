@@ -60,7 +60,8 @@ export default function DashboardLayout({
           </Suspense>
         </div>
       </aside>
-      <main className="m-10 w-full border-2 border-red-300 ">{children}</main>
+
+      <main className="m-10 w-full ">{children}</main>
     </section>
   );
 }

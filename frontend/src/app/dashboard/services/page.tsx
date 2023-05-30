@@ -1,47 +1,53 @@
+"use client";
+
 import { Service } from "@/interfaces/Service";
-import { Suspense } from "react";
-import { Table } from "./table";
 import { DocumentDuplicate } from "@/components/Icons/DocumentDuplicate";
-import { Button } from "@/components/Button";
-import Link from "next/link";
-import { Input } from "@/components/Input";
+import { Form } from "./Form";
+import { Table } from "./Table";
+import { Loading } from "@/components/Icons/Loading";
+import { useQueryService } from "@/hooks/useQueryService";
+import { ToastContainer } from "react-toastify";
 
-interface Props {
-  searchParams?: {
-    name: string;
-    price: string;
-  };
-}
+export default function Service() {
+  const { isFetching, isLoading, isRefetching, refetch } = useQueryService();
 
-export default function Service({searchParams}: Props) {
+  const loading = isFetching || isLoading || isRefetching;
+
   return (
     <div>
-      <div className="flex justify-between">
-        <h1 className=" mb-8 flex items-center gap-5 text-4xl text-gray-700">
+      <div className="mb-8 flex items-end gap-3">
+        <h1 className=" flex items-center gap-5 text-4xl text-gray-700">
           <DocumentDuplicate className="h-9 w-9 text-gray-500" />
           Serviços
         </h1>
-        <div className="flex items-center">
-          <Input id="service-name" type="text" placeholder="Nome" value={searchParams?.name?? ''}/>
-          <Input id="service-price" type="text" placeholder="Preço" value={searchParams?.price?? ''}/>
-          <Button color="green" text={searchParams?.name? 'Edit' : 'Create'}/>
-          <Link href={'dashboard/services'}><Button color="red" text="Cancel"/></Link>
-        </div>
+        <button type="button" onClick={() => refetch()} disabled={loading}>
+          <Loading
+            className={`mb-2 ml-2 h-4 w-4 text-gray-600 hover:cursor-pointer hover:text-black ${
+              loading && "animate-spin hover:cursor-not-allowed "
+            }`}
+          />
+        </button>
       </div>
       <div className="flex flex-col">
-        <div className="flex flex-col">
-          <div className="overflow-x-auto">
-            <div className="inline-block w-full p-1.5 align-middle">
-              <div className="overflow-hidden">
-                <Suspense fallback={<div>loading...</div>}>
-                  {/* @ts-expect-error Async Server Component */}
-                  <Table />
-                </Suspense>
-              </div>
+        <div className="overflow-x-auto">
+          <div className="inline-block w-full align-middle">
+            <Form />
+            <div className="mt-5 max-h-[660px] w-3/5 overflow-auto">
+              <Table />
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={true}
+        newestOnTop={true}
+        closeOnClick
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 }
