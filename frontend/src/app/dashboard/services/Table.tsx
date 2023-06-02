@@ -56,7 +56,6 @@ export function Table() {
       toast.error(error?.data.message ?? "Ocorreu um erro!", { delay: 0 });
     },
     onSettled: async () => {
-      state.clear();
       await refetch();
     },
   });
@@ -85,13 +84,14 @@ export function Table() {
     },
     onSettled: async () => {
       state.clear();
-      await refetch();
+      queryClient.invalidateQueries({ queryKey: ["services"] });
+      //await refetch();
     },
   });
 
   const ServiceSchema = z.object({
     name: z.string().min(4),
-    price: z.string().min(1),
+    price: z.coerce.number().default(0),
   });
 
   type ServiceData = z.infer<typeof ServiceSchema>;
@@ -106,7 +106,8 @@ export function Table() {
   });
 
   async function editService(data: Service) {
-    await backend.put(`/services/${state.service.id}`, {
+    state.clear();
+    await backend.put(`/services/${data.id}`, {
       name: data.name,
       price: Number(data.price),
     });
@@ -116,6 +117,7 @@ export function Table() {
   }
 
   async function onSubmit(data: ServiceData) {
+    console.log(state.service);
     const formData = {
       id: state.service.id!,
       name: data.name,
@@ -169,7 +171,7 @@ export function Table() {
             </th>
           </tr>
         </thead>
-        <tbody className="">
+        <tbody>
           {isLoading ? (
             <TableLoading />
           ) : (
@@ -235,7 +237,6 @@ export function Table() {
                           type="button"
                           onClick={() => {
                             state.setService(name, price.toString(), id);
-                            reset();
                           }}
                         >
                           <Pencil />
