@@ -4,7 +4,6 @@ import { Service } from "@/interfaces/Service";
 import { DocumentDuplicate } from "@/components/Icons/DocumentDuplicate";
 import { Form } from "./Form";
 import { Table } from "./Table";
-import { Loading } from "@/components/Icons/Loading";
 import { useQueryService } from "@/hooks/useQueryService";
 import { ToastContainer } from "react-toastify";
 import { RefetchButton } from "@/components/RefetchButton";
