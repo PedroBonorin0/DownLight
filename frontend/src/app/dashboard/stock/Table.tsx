@@ -1,8 +1,8 @@
 "use client";
 import { Pencil } from "@/components/Icons/Pencil";
 import { Trash } from "@/components/Icons/Trash";
-import { useQueryService } from "@/hooks/useQueryService";
-import { useServiceStore } from "@/hooks/useServiceStore";
+import { useQueryProduct } from "@/hooks/useQueryProduct";
+import { useProductStore } from "@/hooks/useProductStore";
 import { TableLoading } from "./TableLoading";
 import { DeleteModal } from "@/components/DeleteModal";
 import { useState } from "react";
@@ -16,34 +16,35 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ControlledInput } from "@/components/ControlledInput";
 import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Service } from "@/interfaces/Service";
+import { Product } from "@/interfaces/Product";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 
 export function Table() {
   const queryClient = useQueryClient();
-  const state = useServiceStore();
-  const { data: services, isLoading, refetch } = useQueryService();
+  const state = useProductStore();
+  const { data: products, isLoading, refetch } = useQueryProduct();
   const { mutate: mutateEdit, isLoading: isEditing } = useMutation({
-    mutationKey: ["Service", "Edit"],
-    mutationFn: editService,
+    mutationKey: ["Product", "Edit"],
+    mutationFn: editProduct,
     onMutate: async (data) => {
-      await queryClient.cancelQueries({ queryKey: ["services"] });
+      await queryClient.cancelQueries({ queryKey: ["products"] });
 
-      const previousTodos = queryClient.getQueryData(["services"]);
+      const previousTodos = queryClient.getQueryData(["products"]);
 
-      queryClient.setQueryData(["services"], (old: any) => {
-        const services = old?.map((service: Service) => {
-          if (service.id === data.id) {
+      queryClient.setQueryData(["products"], (old: any) => {
+        const products = old?.map((product: Product) => {
+          if (product.id === data.id) {
             return {
               id: data.id,
               name: data.name,
               price: data.price,
+              amount: data.amount,
               formattedPrice: CurrencyFormatter.format(data.price),
             };
           }
-          return service;
+          return product;
         });
-        return services;
+        return products;
       });
 
       return { previousTodos };
@@ -52,7 +53,7 @@ export function Table() {
       toast.success("Edição concluída com sucesso!", { delay: 0 });
     },
     onError: (error: any, _variables, context) => {
-      queryClient.setQueryData(["services"], context?.previousTodos);
+      queryClient.setQueryData(["products"], context?.previousTodos);
       toast.error(error?.data.message ?? "Ocorreu um erro!", { delay: 0 });
     },
     onSettled: async () => {
@@ -62,16 +63,16 @@ export function Table() {
   });
 
   const { mutate: mutateDelete, isLoading: isDeleting } = useMutation({
-    mutationKey: ["Service", "Delete"],
-    mutationFn: deleteService,
+    mutationKey: ["Product", "Delete"],
+    mutationFn: deleteProduct,
     onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: ["services"] });
+      await queryClient.cancelQueries({ queryKey: ["products"] });
 
-      const previousTodos = queryClient.getQueryData(["services"]);
+      const previousTodos = queryClient.getQueryData(["products"]);
 
-      queryClient.setQueryData(["services"], (old: any) => {
-        const services = old.filter((service: Service) => service.id !== id);
-        return services;
+      queryClient.setQueryData(["products"], (old: any) => {
+        const products = old.filter((product: Product) => product.id !== id);
+        return products;
       });
 
       return { previousTodos };
@@ -80,7 +81,7 @@ export function Table() {
       toast.success("Deleção concluída com sucesso!", { delay: 0 });
     },
     onError: (error: any, _variables, context) => {
-      queryClient.setQueryData(["services"], context?.previousTodos);
+      queryClient.setQueryData(["products"], context?.previousTodos);
       toast.error(error?.data.message ?? "Ocorreu um erro!", { delay: 0 });
     },
     onSettled: async () => {
@@ -89,53 +90,56 @@ export function Table() {
     },
   });
 
-  const ServiceSchema = z.object({
+  const ProductSchema = z.object({
     name: z.string().min(4),
     price: z.string().min(1),
+    amount: z.string()
   });
 
-  type ServiceData = z.infer<typeof ServiceSchema>;
+  type ProductData = z.infer<typeof ProductSchema>;
 
   const {
     control,
     reset,
     handleSubmit,
     formState: { errors },
-  } = useForm<ServiceData>({
-    resolver: zodResolver(ServiceSchema),
+  } = useForm<ProductData>({
+    resolver: zodResolver(ProductSchema),
   });
 
-  async function editService(data: Service) {
-    await backend.put(`/services/${state.service.id}`, {
+  async function editProduct(data: Product) {
+    await backend.put(`/products/${state.product.id}`, {
       name: data.name,
       price: Number(data.price),
+      amount: Number(data.amount)
     });
   }
-  async function deleteService(id: string) {
-    await backend.delete(`/services/${id}`);
+  async function deleteProduct(id: string) {
+    await backend.delete(`/products/${id}`);
   }
 
-  async function onSubmit(data: ServiceData) {
+  async function onSubmit(data: ProductData) {
     const formData = {
-      id: state.service.id!,
+      id: state.product.id!,
       name: data.name,
       price: Number(data.price),
+      amount: Number(data.amount),
     };
     mutateEdit(formData);
   }
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [serviceSelected, setServiceSelected] = useState({
+  const [productSelected, setProductSelected] = useState({
     name: "",
     id: "",
   });
 
   function handleDeleteClick(selected: { name: string; id: string }) {
     setDeleteModalOpen(true);
-    setServiceSelected(selected);
+    setProductSelected(selected);
   }
 
   async function handleDeleteAction() {
-    mutateDelete(serviceSelected.id);
+    mutateDelete(productSelected.id);
   }
 
   return (
@@ -163,6 +167,12 @@ export function Table() {
             </th>
             <th
               scope="col"
+              className="px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 "
+            >
+              Quantidade
+            </th>
+            <th
+              scope="col"
               className="py-3 text-center text-xs font-bold uppercase text-gray-500"
             >
               Ações
@@ -173,13 +183,13 @@ export function Table() {
           {isLoading ? (
             <TableLoading />
           ) : (
-            services?.map(({ id, name, price, formattedPrice }, index) => (
+            products?.map(({ id, name, price, amount, formattedPrice }, index) => (
               <tr key={id} className="odd:bg-gray-50">
                 <td className="text-md whitespace-nowrap rounded-s-lg  px-6  font-medium text-gray-800">
                   {index + 1}
                 </td>
                 <td className="text-md whitespace-nowrap  text-gray-800">
-                  {state.service.id === id ? (
+                  {state.product.id === id ? (
                     <ControlledInput
                       id={name}
                       defaultValue={name}
@@ -192,7 +202,7 @@ export function Table() {
                   )}
                 </td>
                 <td className="text-md whitespace-nowrap text-gray-800">
-                  {state.service.id === id ? (
+                  {state.product.id === id ? (
                     <ControlledInput
                       id={`${name}:price`}
                       defaultValue={price.toString()}
@@ -204,9 +214,22 @@ export function Table() {
                     <Input id="price" defaultValue={formattedPrice} disabled />
                   )}
                 </td>
+                <td className="text-md whitespace-nowrap text-gray-800">
+                  {state.product.id === id ? (
+                    <ControlledInput
+                      id={`${name}:amount`}
+                      defaultValue={amount.toString()}
+                      placeholder="Preço"
+                      name="amount"
+                      control={control}
+                    />
+                  ) : (
+                    <Input id="amount" defaultValue={amount} disabled />
+                  )}
+                </td>
                 <td className="text-md whitespace-nowrap rounded-e-lg px-3 py-4 font-medium">
                   <div className="flex justify-center gap-5 text-gray-500 ">
-                    {state.service.id === id ? (
+                    {state.product.id === id ? (
                       <>
                         <button
                           className="cursor-pointer text-green-700 hover:text-green-500 disabled:cursor-progress disabled:opacity-70"
@@ -234,7 +257,8 @@ export function Table() {
                           className="cursor-pointer hover:text-blue-700"
                           type="button"
                           onClick={() => {
-                            state.setService(name, price.toString(), id);
+                            state.setProduct(
+                              name, price.toString(), amount, id);
                             reset();
                           }}
                         >
@@ -258,11 +282,11 @@ export function Table() {
         </tbody>
       </table>
       <DeleteModal
-        title="Deletar serviço"
-        description="Tem certeza que deseja deletar este serviço?"
+        title="Deletar produto"
+        description="Tem certeza que deseja deletar este produto?"
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
-        itemSelected={serviceSelected}
+        itemSelected={productSelected}
         deleteAction={handleDeleteAction}
       />
     </>

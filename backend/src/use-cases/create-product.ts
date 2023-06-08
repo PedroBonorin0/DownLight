@@ -6,7 +6,7 @@ import { ProductAlreadyExistsError } from "./errors/product-already-exists-error
 interface CreateProductUseCaseRequest {
   name: string;
   price: number;
-  amount?: number;
+  amount: number;
 }
 
 interface CreateProductUseCaseResponse {
