@@ -31,7 +31,7 @@ export default function DashboardLayout({
                 />
                 <MenuItem
                   title="Estoque"
-                  icon={<Stack />}
+                  icon={<Stack className="h-6 w-6" />}
                   href="/dashboard/stock"
                 />
                 <MenuItem

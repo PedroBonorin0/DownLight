@@ -21,7 +21,6 @@ export class EditServiceUseCase {
     price,
     id,
   }: EditServiceUseCaseRequest): Promise<EditServiceUseCaseResponse> {
-    await new Promise((r) => setTimeout(r, 2000));
     const serviceExists = await this.servicesRepository.findById(id);
 
     if (!serviceExists) {

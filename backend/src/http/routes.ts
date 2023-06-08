@@ -4,6 +4,7 @@ import { authenticate } from './controllers/authenticate';
 import { profile } from './controllers/profile';
 import { verifyJWT } from './middlewares/verify-jwt';
 import { listAllServices, createService, editService, deleteService } from './controllers/service';
+import { listAllProducts, createProduct, editProduct, deleteProduct } from './controllers/product';
 
 export async function appRoutes(app: FastifyInstance) {
   app.post('/users', register);
@@ -14,6 +15,12 @@ export async function appRoutes(app: FastifyInstance) {
   app.get('/services', listAllServices);
   app.put('/services/:id', editService);
   app.delete('/services/:id', deleteService);
+
+  // Produtos
+  app.post('/products', createProduct);
+  app.get('/products', listAllProducts);
+  app.put('/products/:id', editProduct);
+  app.delete('/products/:id', deleteProduct);
 
   /* Authenticated */
   app.get('/me', { onRequest: [verifyJWT] }, profile);
