@@ -1,19 +1,19 @@
 "use client";
 import { Pencil } from "@/components/Icons/Pencil";
 import { Trash } from "@/components/Icons/Trash";
-import { useQueryService } from "@/hooks/useQueryService";
-import { useServiceStore } from "@/hooks/useServiceStore";
-import { TableLoading } from "./TableLoading";
 import { DeleteModal } from "@/components/DeleteModal";
-import { useState } from "react";
-import { backend } from "@/lib/axios";
 import { Input } from "@/components/Input";
 import { Check } from "@/components/Icons/Check";
 import { X } from "@/components/Icons/X";
+import { ControlledInput } from "@/components/ControlledInput";
+import { useQueryService } from "@/hooks/useQueryService";
+import { useServiceStore } from "@/hooks/useServiceStore";
+import { TableLoading } from "./TableLoading";
+import { useState } from "react";
+import { backend } from "@/lib/axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ControlledInput } from "@/components/ControlledInput";
 import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Service } from "@/interfaces/Service";
@@ -22,6 +22,18 @@ import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 export function Table() {
   const queryClient = useQueryClient();
   const state = useServiceStore();
+
+ const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  // const [serviceSelected, setServiceSelected] = useState({
+  //   name: "",
+  //   id: "",
+  // });
+  function handleModalOpen(open: boolean){
+    setDeleteModalOpen(open);
+    if(!open){
+      state.setServiceToDelete(null)
+    }
+  }
   const { data: services, isLoading, refetch } = useQueryService();
   const { mutate: mutateEdit, isLoading: isEditing } = useMutation({
     mutationKey: ["Service", "Edit"],
@@ -107,6 +119,7 @@ export function Table() {
 
   async function editService(data: Service) {
     state.clear();
+    reset();
     await backend.put(`/services/${data.id}`, {
       name: data.name,
       price: Number(data.price),
@@ -117,7 +130,6 @@ export function Table() {
   }
 
   async function onSubmit(data: ServiceData) {
-    console.log(state.service);
     const formData = {
       id: state.service.id!,
       name: data.name,
@@ -125,20 +137,16 @@ export function Table() {
     };
     mutateEdit(formData);
   }
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [serviceSelected, setServiceSelected] = useState({
-    name: "",
-    id: "",
-  });
 
-  function handleDeleteClick(selected: { name: string; id: string }) {
+  function handleDeleteClick( name: string, id: string ) {
     setDeleteModalOpen(true);
-    setServiceSelected(selected);
+    state.setServiceToDelete({name,id});
   }
 
   async function handleDeleteAction() {
-    mutateDelete(serviceSelected.id);
+    mutateDelete(state.serviceToDelete?.id!);
   }
+
 
   return (
     <>
@@ -245,7 +253,7 @@ export function Table() {
                         <button
                           className="cursor-pointer hover:text-red-700"
                           type="button"
-                          onClick={() => handleDeleteClick({ name, id })}
+                          onClick={() => handleDeleteClick( name, id )}
                         >
                           <Trash />
                         </button>
@@ -259,11 +267,10 @@ export function Table() {
         </tbody>
       </table>
       <DeleteModal
-        title="Deletar serviço"
+        title={"Deletar serviço "+ state.serviceToDelete?.name}
         description="Tem certeza que deseja deletar este serviço?"
         open={deleteModalOpen}
-        onOpenChange={setDeleteModalOpen}
-        serviceSelected={serviceSelected}
+        onOpenChange={handleModalOpen}
         deleteAction={handleDeleteAction}
       />
     </>

@@ -4,17 +4,22 @@ interface ServiceState {
   service: { name: string; price: string; id: string | undefined };
   clear: () => void;
   setService: (name: string, price: string, id: string) => void;
-  isServiceSelected: boolean;
+  setServiceToDelete: (service:{name:string,id:string}|null) => void;
+  serviceToDelete: { name: string; id: string }|null;
 }
 
 export const useServiceStore = create<ServiceState>((set) => ({
-  isServiceSelected: false,
   service: { name: "", price: "", id: undefined },
-  clear: () =>
-    set({
-      service: { name: "", price: "", id: undefined },
-      isServiceSelected: false,
-    }),
+
+  serviceToDelete: { name: "", id: "" },
+
+  clear: () => 
+    set({service: { name: "", price: "", id: undefined }}),
+  
   setService: (name: string, price: string, id: string) =>
-    set({ service: { name, price, id }, isServiceSelected: true }),
+    set({ service: { name, price, id }}),
+
+  setServiceToDelete: (service) =>
+    set({ serviceToDelete: service}),
+
 }));
