@@ -17,12 +17,15 @@ import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Service } from "@/interfaces/Service";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
+import { useState } from "react";
 
 export function Table() {
   const queryClient = useQueryClient();
   const state = useServiceStore();
 
+  const [modalOpen, setModalOpen] = useState(false)
   function handleModalClose(open:boolean){
+    setModalOpen(open);
     !open && state.setServiceToDelete(null)
   }
   const { data: services, isLoading, refetch } = useQueryService();
@@ -130,7 +133,7 @@ export function Table() {
   }
 
   function handleDeleteClick( name: string, id: string ) {
-    //setDeleteModalOpen(true);
+    setModalOpen(true);
     state.setServiceToDelete({name,id});
   }
 
@@ -260,7 +263,7 @@ export function Table() {
       <DeleteModal
         title={"Deletar serviço "+ state.serviceToDelete?.name}
         description="Tem certeza que deseja deletar este serviço?"
-        open={!!state.serviceToDelete}
+        open={modalOpen}
         onOpenChange={handleModalClose}
         deleteAction={handleDeleteAction}
       />
