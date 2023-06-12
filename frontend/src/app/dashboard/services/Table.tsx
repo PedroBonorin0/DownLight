@@ -9,7 +9,6 @@ import { ControlledInput } from "@/components/ControlledInput";
 import { useQueryService } from "@/hooks/useQueryService";
 import { useServiceStore } from "@/hooks/useServiceStore";
 import { TableLoading } from "./TableLoading";
-import { useState } from "react";
 import { backend } from "@/lib/axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -23,16 +22,8 @@ export function Table() {
   const queryClient = useQueryClient();
   const state = useServiceStore();
 
- const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  // const [serviceSelected, setServiceSelected] = useState({
-  //   name: "",
-  //   id: "",
-  // });
-  function handleModalOpen(open: boolean){
-    setDeleteModalOpen(open);
-    if(!open){
-      state.setServiceToDelete(null)
-    }
+  function handleModalClose(open:boolean){
+    !open && state.setServiceToDelete(null)
   }
   const { data: services, isLoading, refetch } = useQueryService();
   const { mutate: mutateEdit, isLoading: isEditing } = useMutation({
@@ -139,7 +130,7 @@ export function Table() {
   }
 
   function handleDeleteClick( name: string, id: string ) {
-    setDeleteModalOpen(true);
+    //setDeleteModalOpen(true);
     state.setServiceToDelete({name,id});
   }
 
@@ -269,8 +260,8 @@ export function Table() {
       <DeleteModal
         title={"Deletar serviço "+ state.serviceToDelete?.name}
         description="Tem certeza que deseja deletar este serviço?"
-        open={deleteModalOpen}
-        onOpenChange={handleModalOpen}
+        open={!!state.serviceToDelete}
+        onOpenChange={handleModalClose}
         deleteAction={handleDeleteAction}
       />
     </>
