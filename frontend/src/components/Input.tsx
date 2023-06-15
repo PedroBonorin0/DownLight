@@ -10,7 +10,7 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
 
 export function Input({ id, label, error, forwardRef, ...rest }: Props) {
   return (
-    <div>
+    <div className="">
       {label && (
         <label
           htmlFor={id}
@@ -27,7 +27,7 @@ export function Input({ id, label, error, forwardRef, ...rest }: Props) {
             error
               ? "ring-red-400 focus:ring-red-600"
               : "ring-gray-300 focus:ring-blue-600"
-          } text-md rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm outline-none ring-1  ring-inset placeholder:text-gray-400 focus:ring-2  focus:ring-inset disabled:bg-transparent disabled:shadow-none disabled:ring-0`}
+          } text-md w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm outline-none ring-1  ring-inset placeholder:text-gray-400 focus:ring-2  focus:ring-inset disabled:bg-transparent disabled:shadow-none disabled:ring-0`}
           {...rest}
         />
         <span className="text-xs text-red-600">{error?.message}</span>

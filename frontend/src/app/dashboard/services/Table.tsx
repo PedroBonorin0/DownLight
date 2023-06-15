@@ -1,27 +1,33 @@
 "use client";
 import { Pencil } from "@/components/Icons/Pencil";
 import { Trash } from "@/components/Icons/Trash";
-import { useQueryService } from "@/hooks/useQueryService";
-import { useServiceStore } from "@/hooks/useServiceStore";
-import { TableLoading } from "./TableLoading";
 import { DeleteModal } from "@/components/DeleteModal";
-import { useState } from "react";
-import { backend } from "@/lib/axios";
 import { Input } from "@/components/Input";
 import { Check } from "@/components/Icons/Check";
 import { X } from "@/components/Icons/X";
+import { ControlledInput } from "@/components/ControlledInput";
+import { useQueryService } from "@/hooks/useQueryService";
+import { useServiceStore } from "@/hooks/useServiceStore";
+import { TableLoading } from "./TableLoading";
+import { backend } from "@/lib/axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ControlledInput } from "@/components/ControlledInput";
 import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Service } from "@/interfaces/Service";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
+import { useState } from "react";
 
 export function Table() {
   const queryClient = useQueryClient();
   const state = useServiceStore();
+
+  const [modalOpen, setModalOpen] = useState(false)
+  function handleModalClose(open:boolean){
+    setModalOpen(open);
+    !open && state.setServiceToDelete(null)
+  }
   const { data: services, isLoading, refetch } = useQueryService();
   const { mutate: mutateEdit, isLoading: isEditing } = useMutation({
     mutationKey: ["Service", "Edit"],
@@ -56,7 +62,6 @@ export function Table() {
       toast.error(error?.data.message ?? "Ocorreu um erro!", { delay: 0 });
     },
     onSettled: async () => {
-      state.clear();
       await refetch();
     },
   });
@@ -85,13 +90,14 @@ export function Table() {
     },
     onSettled: async () => {
       state.clear();
-      await refetch();
+      queryClient.invalidateQueries({ queryKey: ["services"] });
+      //await refetch();
     },
   });
 
   const ServiceSchema = z.object({
     name: z.string().min(4),
-    price: z.string().min(1),
+    price: z.coerce.number().default(0),
   });
 
   type ServiceData = z.infer<typeof ServiceSchema>;
@@ -106,7 +112,9 @@ export function Table() {
   });
 
   async function editService(data: Service) {
-    await backend.put(`/services/${state.service.id}`, {
+    state.clear();
+    reset();
+    await backend.put(`/services/${data.id}`, {
       name: data.name,
       price: Number(data.price),
     });
@@ -123,20 +131,16 @@ export function Table() {
     };
     mutateEdit(formData);
   }
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [serviceSelected, setServiceSelected] = useState({
-    name: "",
-    id: "",
-  });
 
-  function handleDeleteClick(selected: { name: string; id: string }) {
-    setDeleteModalOpen(true);
-    setServiceSelected(selected);
+  function handleDeleteClick( name: string, id: string ) {
+    setModalOpen(true);
+    state.setServiceToDelete({name,id});
   }
 
   async function handleDeleteAction() {
-    mutateDelete(serviceSelected.id);
+    mutateDelete(state.serviceToDelete?.id!);
   }
+
 
   return (
     <>
@@ -169,7 +173,7 @@ export function Table() {
             </th>
           </tr>
         </thead>
-        <tbody className="">
+        <tbody>
           {isLoading ? (
             <TableLoading />
           ) : (
@@ -235,7 +239,6 @@ export function Table() {
                           type="button"
                           onClick={() => {
                             state.setService(name, price.toString(), id);
-                            reset();
                           }}
                         >
                           <Pencil />
@@ -244,7 +247,7 @@ export function Table() {
                         <button
                           className="cursor-pointer hover:text-red-700"
                           type="button"
-                          onClick={() => handleDeleteClick({ name, id })}
+                          onClick={() => handleDeleteClick( name, id )}
                         >
                           <Trash />
                         </button>
@@ -258,11 +261,10 @@ export function Table() {
         </tbody>
       </table>
       <DeleteModal
-        title="Deletar serviço"
+        title={"Deletar serviço "+ state.serviceToDelete?.name}
         description="Tem certeza que deseja deletar este serviço?"
-        open={deleteModalOpen}
-        onOpenChange={setDeleteModalOpen}
-        itemSelected={serviceSelected}
+        open={modalOpen}
+        onOpenChange={handleModalClose}
         deleteAction={handleDeleteAction}
       />
     </>
