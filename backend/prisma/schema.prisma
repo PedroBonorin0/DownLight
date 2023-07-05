@@ -12,19 +12,85 @@ model Service {
   name       String   @unique
   price      Decimal  @db.Decimal(5, 2)
   created_at DateTime @default(now())
+
+  orders ServicesInOrder[]
+
+  @@map("services")
 }
 
 model Product {
-  id         String   @id @default(uuid())
-  name       String   @unique
-  price      Decimal  @db.Decimal(5, 2)
-  amount     Int      @default(0)
-  created_at DateTime @default(now())
+  id         String            @id @default(uuid())
+  name       String            @unique
+  price      Decimal           @db.Decimal(5, 2)
+  amount     Int               @default(0)
+  created_at DateTime          @default(now())
+  orders     ProductsInOrder[]
+
+  @@map("products")
 }
 
-enum Role {
-  ADMIN
-  MEMBER
+model Status {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  color      String
+  created_at DateTime @default(now())
+
+  permissions StatusPermission[] @default([DELETE, EDIT])
+  orders      Order[]
+
+  @@map("status")
+}
+
+enum StatusPermission {
+  DELETE
+  EDIT
+}
+
+model Order {
+  id          String    @id @default(uuid())
+  description String
+  paid        Boolean   @default(false)
+  car_info    String
+  budget      Decimal   @db.Decimal(5, 2)
+  priority    Priority  @default(LOW)
+  deadline    DateTime?
+  created_at  DateTime  @default(now())
+  status_id   String
+
+  services ServicesInOrder[]
+  products ProductsInOrder[]
+
+  status Status @relation(fields: [status_id], references: [id])
+
+  @@map("orders")
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model ServicesInOrder {
+  order_id   String
+  service_id String
+
+  order   Order   @relation(fields: [order_id], references: [id])
+  service Service @relation(fields: [service_id], references: [id])
+
+  @@id([order_id, service_id])
+  @@map("services_in_order")
+}
+
+model ProductsInOrder {
+  order_id   String
+  product_id String
+
+  order   Order   @relation(fields: [order_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@id([product_id, order_id])
+  @@map("products_in_order")
 }
 
 model User {
@@ -35,4 +101,11 @@ model User {
   avatar_url String
   role       Role     @default(MEMBER)
   created_at DateTime @default(now())
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
 }
