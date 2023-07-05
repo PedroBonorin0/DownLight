@@ -7,7 +7,7 @@ interface GetAllServicesUseCaseResponse {
 }
 
 export class GetAllServicesUseCase {
-  constructor(private servicesRepository: ServicesRepository) {}
+  constructor(private servicesRepository: ServicesRepository) { }
 
   async execute(): Promise<GetAllServicesUseCaseResponse> {
     await new Promise((r) => setTimeout(r, 2000));

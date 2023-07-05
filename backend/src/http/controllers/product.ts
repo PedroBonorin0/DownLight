@@ -1,19 +1,19 @@
 import { PrismaProductsRepository } from "@/repositories/prisma/prisma-products-repository";
 import { FastifyRequest, FastifyReply } from "fastify";
 import { z } from "zod";
-import { CreateProductUseCase } from "@/use-cases/create-product";
 import { ProductAlreadyExistsError } from "@/use-cases/errors/product-already-exists-error";
-import { GetAllProductsUseCase } from "@/use-cases/get-all-products";
-import { EditProductUseCase } from "@/use-cases/edit-product";
-import { UserAlreadyExistsError } from "@/use-cases/errors/user-already-exists-error";
-import { DeleteProductUseCase } from "@/use-cases/delete-product";
+import { CreateProductUseCase } from "@/use-cases/product/create-product";
+import { GetAllProductsUseCase } from "@/use-cases/product/get-all-products";
+import { EditProductUseCase } from "@/use-cases/product/edit-product";
+import { DeleteProductUseCase } from "@/use-cases/product/delete-product";
+import { ResourceNotFoundError } from "@/use-cases/errors/resource-not-found-error";
 
 export async function listAllProducts(
   _request: FastifyRequest,
   reply: FastifyReply
 ) {
   const productsRepository = new PrismaProductsRepository();
-    const createProductUseCase = new GetAllProductsUseCase(productsRepository);
+  const createProductUseCase = new GetAllProductsUseCase(productsRepository);
 
   const { products } = await createProductUseCase.execute();
 
@@ -30,7 +30,7 @@ export async function createProduct(
     amount: z.number()
   });
 
-  const { name, price,  amount } = createProductBodySchema.parse(request.body);
+  const { name, price, amount } = createProductBodySchema.parse(request.body);
 
   try {
     const productsRepository = new PrismaProductsRepository();
@@ -107,7 +107,7 @@ export async function deleteProduct(
       id,
     });
   } catch (err) {
-    if (err instanceof UserAlreadyExistsError) {
+    if (err instanceof ResourceNotFoundError) {
       return reply.status(409).send({ message: err.message });
     }
     throw err;

@@ -1,7 +1,7 @@
 import { ProductsRepository } from "@/repositories/products-repository";
 import { Product } from "@prisma/client";
 import { ResourceNotFoundError } from "@/use-cases/errors/resource-not-found-error";
-import { ProductAlreadyExistsError } from "./errors/product-already-exists-error";
+import { ProductAlreadyExistsError } from "../errors/product-already-exists-error";
 
 interface CreateProductUseCaseRequest {
   name: string;
@@ -14,7 +14,7 @@ interface CreateProductUseCaseResponse {
 }
 
 export class CreateProductUseCase {
-  constructor(private productsRepository: ProductsRepository) {}
+  constructor(private productsRepository: ProductsRepository) { }
 
   async execute({
     name,

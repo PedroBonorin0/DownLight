@@ -1,5 +1,5 @@
 import { PrismaUsersRepository } from "@/repositories/prisma/prisma-users-repository";
-import { GetUserProfileUseCase } from "@/use-cases/get-user-profile";
+import { GetUserProfileUseCase } from "@/use-cases/user/get-user-profile";
 import { FastifyRequest, FastifyReply } from "fastify";
 
 export async function profile(request: FastifyRequest, reply: FastifyReply) {
