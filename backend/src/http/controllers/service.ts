@@ -1,12 +1,12 @@
 import { PrismaServicesRepository } from "@/repositories/prisma/prisma-services-repository";
-import { CreateServiceUseCase } from "@/use-cases/create-service";
-import { GetAllServicesUseCase } from "@/use-cases/get-all-services";
-import { EditServiceUseCase } from "@/use-cases/edit-service";
-import { DeleteServiceUseCase } from "@/use-cases/delete-service";
+import { CreateServiceUseCase } from "@/use-cases/service/create-service";
+import { GetAllServicesUseCase } from "@/use-cases/service/get-all-services";
+import { EditServiceUseCase } from "@/use-cases/service/edit-service";
+import { DeleteServiceUseCase } from "@/use-cases/service/delete-service";
 import { FastifyRequest, FastifyReply } from "fastify";
 import { z } from "zod";
-import { UserAlreadyExistsError } from "@/use-cases/errors/user-already-exists-error";
 import { ServiceAlreadyExistsError } from "@/use-cases/errors/service-already-exists-error";
+import { ResourceNotFoundError } from "@/use-cases/errors/resource-not-found-error";
 
 export async function listAllServices(
   _request: FastifyRequest,
@@ -103,7 +103,7 @@ export async function deleteService(
       id,
     });
   } catch (err) {
-    if (err instanceof UserAlreadyExistsError) {
+    if (err instanceof ResourceNotFoundError) {
       // fix me lol
       return reply.status(409).send({ message: err.message });
     }

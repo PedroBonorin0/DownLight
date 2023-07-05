@@ -1,8 +1,9 @@
 import { FastifyInstance } from 'fastify';
+import { verifyJWT } from './middlewares/verify-jwt';
 import { register } from './controllers/register';
+
 import { authenticate } from './controllers/authenticate';
 import { profile } from './controllers/profile';
-import { verifyJWT } from './middlewares/verify-jwt';
 import { listAllServices, createService, editService, deleteService } from './controllers/service';
 import { listAllProducts, createProduct, editProduct, deleteProduct } from './controllers/product';
 

@@ -7,7 +7,7 @@ interface GetAllProductsUseCaseResponse {
 }
 
 export class GetAllProductsUseCase {
-  constructor(private productsRepository: ProductsRepository) {}
+  constructor(private productsRepository: ProductsRepository) { }
 
   async execute(): Promise<GetAllProductsUseCaseResponse> {
     const products = await this.productsRepository.findAll();

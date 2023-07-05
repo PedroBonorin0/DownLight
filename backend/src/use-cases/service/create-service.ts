@@ -1,7 +1,7 @@
 import { ServicesRepository } from "@/repositories/services-repository";
 import { Service } from "@prisma/client";
 import { ResourceNotFoundError } from "@/use-cases/errors/resource-not-found-error";
-import { ServiceAlreadyExistsError } from "./errors/service-already-exists-error";
+import { ServiceAlreadyExistsError } from "../errors/service-already-exists-error";
 
 interface GetUserProfileUseCaseRequest {
   name: string;
@@ -13,7 +13,7 @@ interface CreateServiceUseCaseResponse {
 }
 
 export class CreateServiceUseCase {
-  constructor(private servicesRepository: ServicesRepository) {}
+  constructor(private servicesRepository: ServicesRepository) { }
 
   async execute({
     name,
