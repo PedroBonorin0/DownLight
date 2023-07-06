@@ -19,7 +19,6 @@ export class CreateServiceUseCase {
     name,
     price,
   }: GetUserProfileUseCaseRequest): Promise<CreateServiceUseCaseResponse> {
-    await new Promise((r) => setTimeout(r, 2000));
     const serviceWithSameName = await this.servicesRepository.findByName(name);
 
     if (serviceWithSameName) {

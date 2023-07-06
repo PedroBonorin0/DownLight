@@ -104,7 +104,6 @@ export async function deleteService(
     });
   } catch (err) {
     if (err instanceof ResourceNotFoundError) {
-      // fix me lol
       return reply.status(409).send({ message: err.message });
     }
     throw err;

@@ -1,5 +1,7 @@
 import { PrismaOrdersRepository } from "@/repositories/prisma/prisma-orders-repository";
+import { ResourceNotFoundError } from "@/use-cases/errors/resource-not-found-error";
 import { CreateOrderUseCase } from "@/use-cases/order/create-order";
+import { DeleteOrderUseCase } from "@/use-cases/order/delete-order";
 import { GetAllOrderUseCase } from "@/use-cases/order/get-all-orders";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
@@ -65,4 +67,31 @@ export async function listAllOrders(
   const { orders } = await getAllOrdersUseCase.execute();
 
   return reply.status(200).send(orders);
+}
+
+export async function deleteOrder(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+  const deleteOrdersParamsSchema = z.object({
+    id: z.string(),
+  });
+
+  const { id } = deleteOrdersParamsSchema.parse(request.params);
+
+  try {
+    const ordersRepository = new PrismaOrdersRepository();
+    const deleteOrdersUseCase = new DeleteOrderUseCase(ordersRepository);
+
+    await deleteOrdersUseCase.execute({
+      id,
+    });
+  } catch (err) {
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    throw err;
+  }
+
+  return reply.status(201).send();
 }

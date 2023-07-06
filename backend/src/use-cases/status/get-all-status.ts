@@ -10,7 +10,7 @@ export class GetAllStatusUseCase {
   constructor(private statusRepository: StatusRepository) { }
 
   async execute(): Promise<GetAllStatusUseCaseResponse> {
-    await new Promise((r) => setTimeout(r, 2000));
+
     const status = await this.statusRepository.findAll();
 
     if (!status) {

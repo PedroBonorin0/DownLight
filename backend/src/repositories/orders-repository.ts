@@ -17,6 +17,8 @@ export interface OrderCreateInput {
 export interface OrdersRepository {
   findAll(): Promise<Order[]>;
   create(data: OrderCreateInput): Promise<Order>;
+  delete(id: string): Promise<void>;
+  findById(id: string): Promise<Order | null>;
 
   //edit(data: { name: string; price: number; amount: number; id: string }): Promise<Order>;
   //delete(id: string): Promise<void>;

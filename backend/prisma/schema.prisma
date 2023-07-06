@@ -75,8 +75,8 @@ model ServicesInOrder {
   order_id   String
   service_id String
 
-  order   Order   @relation(fields: [order_id], references: [id])
-  service Service @relation(fields: [service_id], references: [id])
+  order   Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [service_id], references: [id], onDelete: Cascade)
 
   @@id([order_id, service_id])
   @@map("services_in_order")

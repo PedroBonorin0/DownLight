@@ -65,7 +65,6 @@ export class PrismaServicesRepository implements ServicesRepository {
         id,
       },
     });
-
     return service;
   }
 }

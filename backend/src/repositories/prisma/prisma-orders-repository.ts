@@ -3,9 +3,39 @@ import { OrderCreateInput, OrdersRepository } from "../orders-repository";
 import { Order } from "@prisma/client";
 
 export class PrismaOrdersRepository implements OrdersRepository {
+  async findById(id: string): Promise<Order | null> {
+
+    const order = await prisma.order.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return order;
+  }
+  async delete(id: string): Promise<void> {
+
+    await prisma.order.delete({
+      where: { id },
+    });
+
+    return;
+  }
   async findAll(): Promise<Order[]> {
     const allOrders = await prisma.order.findMany({
       orderBy: { created_at: "desc" },
+      include: {
+        services: {
+          select: {
+            service: {
+              select: {
+                id: true,
+                name: true
+              }
+            }
+          }
+        }
+      }
     });
 
     return allOrders;

@@ -6,7 +6,7 @@ import { authenticate } from './controllers/authenticate';
 import { profile } from './controllers/profile';
 import { listAllServices, createService, editService, deleteService } from './controllers/service';
 import { listAllProducts, createProduct, editProduct, deleteProduct } from './controllers/product';
-import { createOrder, listAllOrders } from './controllers/order';
+import { createOrder, deleteOrder, listAllOrders } from './controllers/order';
 import { createStatus, listAllStatus } from './controllers/status';
 
 export async function appRoutes(app: FastifyInstance) {
@@ -28,6 +28,7 @@ export async function appRoutes(app: FastifyInstance) {
   // Orders
   app.post('/orders', createOrder)
   app.get('/orders', listAllOrders)
+  app.delete('/orders/:id', deleteOrder);
 
   //Status
   app.post('/status', createStatus)

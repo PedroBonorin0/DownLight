@@ -22,7 +22,7 @@ export class CreateStatusUseCase {
     color,
     permissions
   }: GetStatusUseCaseRequest): Promise<CreateStatusUseCaseResponse> {
-    await new Promise((r) => setTimeout(r, 2000));
+
 
     const statusWithSameName = await this.statusRepository.findByName(name);
 

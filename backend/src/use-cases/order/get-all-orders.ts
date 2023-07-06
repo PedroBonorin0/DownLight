@@ -10,7 +10,6 @@ export class GetAllOrderUseCase {
   constructor(private orderRepository: OrdersRepository) { }
 
   async execute(): Promise<GetAllOrderUseCaseResponse> {
-    await new Promise((r) => setTimeout(r, 2000));
     const orders = await this.orderRepository.findAll();
 
     if (!orders) {

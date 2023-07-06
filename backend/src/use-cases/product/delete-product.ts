@@ -9,7 +9,7 @@ export class DeleteProductUseCase {
   constructor(private productsRepository: ProductsRepository) { }
 
   async execute({ id }: DeleteProductUseCaseRequest): Promise<void> {
-    const product = this.productsRepository.findById(id);
+    const product = await this.productsRepository.findById(id);
 
     if (!product) {
       throw new ResourceNotFoundError();
