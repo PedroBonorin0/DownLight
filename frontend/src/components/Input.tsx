@@ -14,7 +14,7 @@ export function Input({ id, label, error, forwardRef, ...rest }: Props) {
       {label && (
         <label
           htmlFor={id}
-          className="block text-sm font-medium leading-6 text-gray-900"
+          className="block text-base font-medium leading-7 text-gray-800"
         >
           {label}
         </label>
@@ -23,11 +23,10 @@ export function Input({ id, label, error, forwardRef, ...rest }: Props) {
         <input
           ref={forwardRef}
           id={id}
-          className={`${
-            error
-              ? "ring-red-400 focus:ring-red-600"
-              : "ring-gray-300 focus:ring-blue-600"
-          } text-md w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm outline-none ring-1  ring-inset placeholder:text-gray-400 focus:ring-2  focus:ring-inset disabled:bg-transparent disabled:shadow-none disabled:ring-0`}
+          className={`${error
+            ? "ring-red-400 focus:ring-red-600"
+            : "ring-gray-300 focus:ring-blue-600"
+            } bg-gray-100 text-base font-normal w-full rounded-md border-0 px-3 py-1 text-gray-900 shadow-sm outline-none ring-1  ring-inset placeholder:text-gray-400 focus:ring-2  focus:ring-inset disabled:bg-transparent disabled:shadow-none disabled:ring-0`}
           {...rest}
         />
         <span className="text-xs text-red-600">{error?.message}</span>

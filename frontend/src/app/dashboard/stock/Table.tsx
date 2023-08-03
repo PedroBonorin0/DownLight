@@ -1,28 +1,31 @@
 "use client";
-import { Pencil } from "@/components/Icons/Pencil";
-import { Trash } from "@/components/Icons/Trash";
 import { useQueryProduct } from "@/hooks/useQueryProduct";
 import { useProductStore } from "@/hooks/useProductStore";
 import { TableLoading } from "./TableLoading";
 import { DeleteModal } from "@/components/DeleteModal";
 import { useState } from "react";
 import { backend } from "@/lib/axios";
-import { Input } from "@/components/Input";
-import { Check } from "@/components/Icons/Check";
-import { X } from "@/components/Icons/X";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ControlledInput } from "@/components/ControlledInput";
 import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Product } from "@/interfaces/Product";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
+import { Form } from "@/components/Form";
+import { Icon } from "@/components/Icons";
 
-export function Table() {
+interface Props {
+  filter: string
+}
+
+export function Table({ filter }: Props) {
   const queryClient = useQueryClient();
   const state = useProductStore();
   const { data: products, isLoading, refetch } = useQueryProduct();
+
+  const filteredProducts = products?.filter(product => product.name.startsWith(filter))
+
   const { mutate: mutateEdit, isLoading: isEditing } = useMutation({
     mutationKey: ["Product", "Edit"],
     mutationFn: editProduct,
@@ -91,21 +94,24 @@ export function Table() {
   });
 
   const ProductSchema = z.object({
-    name: z.string().min(4),
-    price: z.string().min(1),
-    amount: z.string()
+    name: z.string().min(4, "O nome deve conter no mínimo 4 letras"),
+    price: z.coerce
+      .number({ invalid_type_error: "Valor deve ser um número" })
+      .nonnegative("Valor não pode ser negativo")
+      .default(0),
+    amount: z.coerce
+      .number({ invalid_type_error: "Valor deve ser um número" })
+      .nonnegative("Valor não pode ser negativo")
+      .default(0),
   });
 
   type ProductData = z.infer<typeof ProductSchema>;
 
-  const {
-    control,
-    reset,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ProductData>({
+  const EditProductForm = useForm<ProductData>({
     resolver: zodResolver(ProductSchema),
   });
+
+  const { handleSubmit, reset, setValue } = EditProductForm
 
   async function editProduct(data: Product) {
     await backend.put(`/products/${state.product.id}`, {
@@ -133,6 +139,14 @@ export function Table() {
     id: "",
   });
 
+  function handleModalClose(open: boolean) {
+    setDeleteModalOpen(open);
+    !open && setProductSelected({
+      name: "",
+      id: "",
+    })
+  }
+
   function handleDeleteClick(selected: { name: string; id: string }) {
     setDeleteModalOpen(true);
     setProductSelected(selected);
@@ -142,127 +156,129 @@ export function Table() {
     mutateDelete(productSelected.id);
   }
 
+  if (products?.length === 0) {
+    return <div>no data</div>
+  }
+
   return (
     <>
-      <table className=" w-full ">
-        <thead>
-          <tr>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 "
+      <div className="table w-full border rounded">
+        <div className="table-header-group">
+          <div className="table-row bg-gray-100">
+            <div
+              className="table-cell px-3 py-3 text-left text-xs font-bold uppercase text-gray-500 rounded-tl"
             >
-              ID
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 "
-            >
-              Nome
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 "
+              Nome do produto
+            </div>
+            <div
+              className="table-cell px-3 py-3 text-left text-xs font-bold uppercase text-gray-500 "
             >
               Preço
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 "
+            </div>
+            <div
+              className="table-cell px-3 py-3 text-left text-xs font-bold uppercase text-gray-500 "
             >
               Quantidade
-            </th>
-            <th
-              scope="col"
-              className="py-3 text-center text-xs font-bold uppercase text-gray-500"
+            </div>
+            <div
+              className="table-cell py-3 text-center text-xs font-bold uppercase text-gray-500 rounded-tr"
             >
               Ações
-            </th>
-          </tr>
-        </thead>
-        <tbody className="">
+            </div>
+          </div>
+        </div>
+        <div className="table-row-group">
           {isLoading ? (
             <TableLoading />
           ) : (
-            products?.map(({ id, name, price, amount, formattedPrice }, index) => (
-              <tr key={id} className="odd:bg-gray-50">
-                <td className="text-md whitespace-nowrap rounded-s-lg  px-6  font-medium text-gray-800">
-                  {index + 1}
-                </td>
-                <td className="text-md whitespace-nowrap  text-gray-800">
-                  {state.product.id === id ? (
-                    <ControlledInput
-                      id={name}
-                      defaultValue={name}
-                      placeholder="Name"
-                      name="name"
-                      control={control}
-                    />
-                  ) : (
-                    <Input id="name" defaultValue={name} disabled />
-                  )}
-                </td>
-                <td className="text-md whitespace-nowrap text-gray-800">
-                  {state.product.id === id ? (
-                    <ControlledInput
-                      id={`${name}:price`}
-                      defaultValue={price.toString()}
-                      placeholder="Preço"
-                      name="price"
-                      control={control}
-                    />
-                  ) : (
-                    <Input id="price" defaultValue={formattedPrice} disabled />
-                  )}
-                </td>
-                <td className="text-md whitespace-nowrap text-gray-800">
-                  {state.product.id === id ? (
-                    <ControlledInput
-                      id={`${name}:amount`}
-                      defaultValue={amount.toString()}
-                      placeholder="Preço"
-                      name="amount"
-                      control={control}
-                    />
-                  ) : (
-                    <Input id="amount" defaultValue={amount} disabled />
-                  )}
-                </td>
-                <td className="text-md whitespace-nowrap rounded-e-lg px-3 py-4 font-medium">
-                  <div className="flex justify-center gap-5 text-gray-500 ">
-                    {state.product.id === id ? (
-                      <>
-                        <button
-                          className="cursor-pointer text-green-700 hover:text-green-500 disabled:cursor-progress disabled:opacity-70"
-                          type="button"
-                          onClick={handleSubmit(onSubmit)}
-                          disabled={isEditing}
-                        >
-                          <Check />
-                        </button>
+            filteredProducts?.map(({ id, name, price, formattedPrice, amount }) =>
 
-                        <button
-                          className="cursor-pointer text-gray-500 hover:text-gray-600"
-                          type="button"
-                          onClick={() => {
-                            state.clear();
-                            reset();
-                          }}
-                        >
-                          <X />
-                        </button>
-                      </>
-                    ) : (
-                      <>
+              state.product.id === id ?
+                (
+
+                  <div key={id} className="table-row">
+
+                    <FormProvider {...EditProductForm}>
+                      <div className="table-cell text-md whitespace-nowrap  text-gray-800 border-t">
+                        <Form.Field className="p-3">
+                          <Form.Label htmlFor="name">Nome do produto</Form.Label>
+                          <Form.Input name="name" className="" />
+                          <Form.ErrorMessage field="name" />
+                        </Form.Field>
+                      </div>
+                      <div className="table-cell text-md whitespace-nowrap text-gray-800 border-t">
+                        <Form.Field className="p-3">
+                          <Form.Label htmlFor="price">Preço</Form.Label>
+                          <Form.Input name="price" className="w-3/4" />
+                          <Form.ErrorMessage field="price" />
+                        </Form.Field>
+                      </div>
+                      <div className="table-cell text-md whitespace-nowrap text-gray-800 border-t">
+                        <Form.Field className="p-3">
+                          <Form.Label htmlFor="amount">Quantidade</Form.Label>
+                          <Form.Input name="amount" className="w-3/4" />
+                          <Form.ErrorMessage field="amount" />
+                        </Form.Field>
+                      </div>
+                      <div className="table-cell text-md whitespace-nowrap px-3 font-medium border-t align-middle">
+                        <div className="flex justify-center gap-5 text-gray-500  items-center">
+
+
+                          <button
+                            className="cursor-pointer text-green-700 hover:text-green-500 disabled:cursor-progress disabled:opacity-70"
+                            type="button"
+                            onClick={handleSubmit(onSubmit)}
+                            disabled={isEditing}
+                          >
+                            <Icon icon="Check" />
+                          </button>
+
+                          <button
+                            className="cursor-pointer text-gray-500 hover:text-gray-600"
+                            type="button"
+                            onClick={() => {
+                              state.clear();
+                              reset();
+                            }}
+                          >
+                            <Icon icon="X" />
+                          </button>
+
+
+                        </div>
+                      </div>
+                    </FormProvider>
+                  </div>
+                )
+                :
+                (
+
+                  <div key={id} className="table-row">
+
+                    <div className="table-cell text-md whitespace-nowrap text-gray-800 border-t">
+                      <div className="px-3">{name}</div>
+                    </div>
+
+                    <div className="table-cell px-3 text-md whitespace-nowrap text-gray-800 border-t">
+                      <div>{formattedPrice}</div>
+                    </div>
+                    <div className="table-cell px-3 text-md whitespace-nowrap text-gray-800 border-t">
+                      <div>{amount}</div>
+                    </div>
+
+                    <div className="table-cell text-md whitespace-nowrap px-1 py-4 font-medium border-t">
+                      <div className="flex justify-center gap-5 text-gray-500 ">
                         <button
                           className="cursor-pointer hover:text-blue-700"
                           type="button"
                           onClick={() => {
-                            state.setProduct(
-                              name, price.toString(), amount, id);
-                            reset();
+                            setValue("price", price)
+                            setValue("name", name)
+                            setValue("amount", amount)
+                            state.setProduct(name, price.toString(), amount, id);
                           }}
                         >
-                          <Pencil />
+                          <Icon icon="Pencil" />
                         </button>
 
                         <button
@@ -270,23 +286,20 @@ export function Table() {
                           type="button"
                           onClick={() => handleDeleteClick({ name, id })}
                         >
-                          <Trash />
+                          <Icon icon="Trash" />
                         </button>
-                      </>
-                    )}
+                      </div>
+                    </div>
                   </div>
-                </td>
-              </tr>
-            ))
+                ))
           )}
-        </tbody>
-      </table>
+        </div>
+      </div >
       <DeleteModal
-        title="Deletar produto"
+        title={"Deletar produto " + state.product?.name}
         description="Tem certeza que deseja deletar este produto?"
         open={deleteModalOpen}
-        onOpenChange={setDeleteModalOpen}
-        itemSelected={productSelected}
+        onOpenChange={handleModalClose}
         deleteAction={handleDeleteAction}
       />
     </>

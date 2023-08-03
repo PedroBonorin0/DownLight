@@ -1,28 +1,37 @@
 "use client";
 
 import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
+import { Form } from "@/components/Form";
+import { Icon } from "@/components/Icons";
 import { useQueryProduct } from "@/hooks/useQueryProduct";
 import { backend } from "@/lib/axios";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Controller, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 
-export function Form() {
+export default function CreateProductForm() {
   const ProductSchema = z.object({
-    name: z.string().min(4),
-    price: z.string().min(1),
-    amount: z.string().min(1)
+    name: z.string().min(4, "O nome deve conter no mínimo 4 letras"),
+    price: z.coerce
+      .number({ invalid_type_error: "Valor deve ser um número" })
+      .nonnegative("Valor não pode ser negativo")
+      .default(0),
+    amount: z.coerce
+      .number({ invalid_type_error: "Valor deve ser um número" })
+      .nonnegative("Valor não pode ser negativo")
+      .default(0),
   });
 
   type ProductData = z.infer<typeof ProductSchema>;
 
-  const { control, handleSubmit, reset } = useForm<ProductData>({
+  const CreateProductForm = useForm<ProductData>({
     resolver: zodResolver(ProductSchema),
   });
+
+  const { handleSubmit, reset } = CreateProductForm
 
   const queryClient = useQueryClient();
   const { refetch } = useQueryProduct();
@@ -71,59 +80,40 @@ export function Form() {
   }
 
   return (
-    <form className="flex items-end gap-3" onSubmit={handleSubmit(onSubmit)}>
-      <Controller
-        defaultValue=""
-        name="name"
-        control={control}
-        render={({ field: { onChange, onBlur, value, ref } }) => (
-          <Input
-            id="product-name"
-            type="text"
-            placeholder="Nome"
-            onChange={onChange}
-            onBlur={onBlur}
-            value={value}
-            forwardRef={ref}
-          />
-        )}
-      />
-      <Controller
-        defaultValue=""
-        name="price"
-        control={control}
-        render={({ field: { onChange, onBlur, value, ref } }) => (
-          <Input
-            id="price"
-            type="text"
-            placeholder="Preço"
-            onChange={onChange}
-            onBlur={onBlur}
-            value={value}
-            forwardRef={ref}
-          />
-        )}
-      />
-      <Controller
-        defaultValue=""
-        name="amount"
-        control={control}
-        render={({ field: { onChange, onBlur, value, ref } }) => (
-          <Input
-            id="amount"
-            type="number"
-            placeholder="Quantidade"
-            onChange={onChange}
-            onBlur={onBlur}
-            value={value}
-            forwardRef={ref}
-          />
-        )}
-      />
-
-      <div className="flex items-end gap-2">
-        <Button text="Cadastrar" type="submit" disabled={isMutating} />
+    <div>
+      <div className="mb-8 flex items-end gap-3">
+        <h1 className=" flex items-center gap-5 text-3xl text-gray-700">
+          <Icon icon="Stack" className="h-9 w-9 text-gray-500" />
+          Estoque
+          /
+          Cadastro
+        </h1>
       </div>
-    </form>
+
+      <FormProvider {...CreateProductForm}>
+        <form className="flex justify-between" onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex gap-4">
+
+            <Form.Field>
+              <Form.Label>Nome do serviço</Form.Label>
+              <Form.Input name="name" className="w-64" />
+              <Form.ErrorMessage field="name" />
+            </Form.Field>
+
+            <Form.Field>
+              <Form.Label>Preço</Form.Label>
+              <Form.Input name="price" placeholder="00.00" />
+              <Form.ErrorMessage field="price" />
+            </Form.Field>
+          </div>
+
+          <div className="flex gap-4 mt-7">
+            <Button text="Cancelar" type="button" color="gray" onClick={close} />
+            <Button text="Cadastrar" type="submit" disabled={isMutating} />
+          </div>
+
+        </form>
+      </FormProvider>
+    </div>
   );
 }

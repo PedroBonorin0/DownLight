@@ -1,16 +1,10 @@
 "use client";
-import { Pencil } from "@/components/Icons/Pencil";
-import { Trash } from "@/components/Icons/Trash";
 import { DeleteModal } from "@/components/DeleteModal";
-import { Input } from "@/components/Input";
-import { Check } from "@/components/Icons/Check";
-import { X } from "@/components/Icons/X";
-import { ControlledInput } from "@/components/ControlledInput";
 import { useQueryService } from "@/hooks/useQueryService";
 import { useServiceStore } from "@/hooks/useServiceStore";
 import { TableLoading } from "./TableLoading";
 import { backend } from "@/lib/axios";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
@@ -18,17 +12,26 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Service } from "@/interfaces/Service";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 import { useState } from "react";
+import { Form } from '@/components/Form'
+import { Icon } from "@/components/Icons";
 
-export function Table() {
+interface Props {
+  filter: string
+}
+
+export function Table({ filter }: Props) {
   const queryClient = useQueryClient();
   const state = useServiceStore();
 
   const [modalOpen, setModalOpen] = useState(false)
-  function handleModalClose(open:boolean){
+  function handleModalClose(open: boolean) {
     setModalOpen(open);
     !open && state.setServiceToDelete(null)
   }
   const { data: services, isLoading, refetch } = useQueryService();
+
+  const filteredServices = services?.filter((service) => service.name.startsWith(filter))
+
   const { mutate: mutateEdit, isLoading: isEditing } = useMutation({
     mutationKey: ["Service", "Edit"],
     mutationFn: editService,
@@ -96,20 +99,20 @@ export function Table() {
   });
 
   const ServiceSchema = z.object({
-    name: z.string().min(4),
-    price: z.coerce.number().default(0),
+    name: z.string().min(4, "O nome deve conter no mínimo 4 letras"),
+    price: z.coerce
+      .number({ invalid_type_error: "Valor deve ser um número" })
+      .nonnegative("Valor não pode ser negativo")
+      .default(0)
   });
 
   type ServiceData = z.infer<typeof ServiceSchema>;
 
-  const {
-    control,
-    reset,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ServiceData>({
+  const EditServiceForm = useForm<ServiceData>({
     resolver: zodResolver(ServiceSchema),
   });
+
+  const { reset, setValue, handleSubmit } = EditServiceForm
 
   async function editService(data: Service) {
     state.clear();
@@ -132,136 +135,137 @@ export function Table() {
     mutateEdit(formData);
   }
 
-  function handleDeleteClick( name: string, id: string ) {
+  function handleDeleteClick(name: string, id: string) {
     setModalOpen(true);
-    state.setServiceToDelete({name,id});
+    state.setServiceToDelete({ name, id });
   }
 
   async function handleDeleteAction() {
     mutateDelete(state.serviceToDelete?.id!);
   }
 
-
   return (
     <>
-      <table className=" w-full ">
-        <thead>
-          <tr>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 "
+      <div className="table w-full border rounded">
+        <div className="table-header-group">
+          <div className="table-row bg-gray-100">
+            <div
+              className="table-cell px-3 py-3 text-left text-xs font-bold uppercase text-gray-500 rounded-tl"
             >
-              ID
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 "
-            >
-              Nome
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 "
+              Nome do serviço
+            </div>
+            <div
+              className="table-cell px-3 py-3 text-left text-xs font-bold uppercase text-gray-500 "
             >
               Preço
-            </th>
-            <th
-              scope="col"
-              className="py-3 text-center text-xs font-bold uppercase text-gray-500"
+            </div>
+            <div
+              className="table-cell py-3 text-center text-xs font-bold uppercase text-gray-500 rounded-tr"
             >
               Ações
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+            </div>
+          </div>
+        </div>
+        <div className="table-row-group">
           {isLoading ? (
             <TableLoading />
           ) : (
-            services?.map(({ id, name, price, formattedPrice }, index) => (
-              <tr key={id} className="odd:bg-gray-50">
-                <td className="text-md whitespace-nowrap rounded-s-lg  px-6  font-medium text-gray-800">
-                  {index + 1}
-                </td>
-                <td className="text-md whitespace-nowrap  text-gray-800">
-                  {state.service.id === id ? (
-                    <ControlledInput
-                      id={name}
-                      defaultValue={name}
-                      placeholder="Name"
-                      name="name"
-                      control={control}
-                    />
-                  ) : (
-                    <Input id="name" defaultValue={name} disabled />
-                  )}
-                </td>
-                <td className="text-md whitespace-nowrap text-gray-800">
-                  {state.service.id === id ? (
-                    <ControlledInput
-                      id={`${name}:price`}
-                      defaultValue={price.toString()}
-                      placeholder="Preço"
-                      name="price"
-                      control={control}
-                    />
-                  ) : (
-                    <Input id="price" defaultValue={formattedPrice} disabled />
-                  )}
-                </td>
-                <td className="text-md whitespace-nowrap rounded-e-lg px-3 py-4 font-medium">
-                  <div className="flex justify-center gap-5 text-gray-500 ">
-                    {state.service.id === id ? (
-                      <>
-                        <button
-                          className="cursor-pointer text-green-700 hover:text-green-500 disabled:cursor-progress disabled:opacity-70"
-                          type="button"
-                          onClick={handleSubmit(onSubmit)}
-                          disabled={isEditing}
-                        >
-                          <Check />
-                        </button>
+            filteredServices?.map(({ id, name, price, formattedPrice }) =>
 
-                        <button
-                          className="cursor-pointer text-gray-500 hover:text-gray-600"
-                          type="button"
-                          onClick={() => {
-                            state.clear();
-                            reset();
-                          }}
-                        >
-                          <X />
-                        </button>
-                      </>
-                    ) : (
-                      <>
+              state.service.id === id ?
+                (
+
+                  <div key={id} className="table-row">
+
+                    <FormProvider {...EditServiceForm}>
+                      <div className="table-cell text-md whitespace-nowrap  text-gray-800 border-t">
+                        <Form.Field className="p-3">
+                          <Form.Label htmlFor="name">Nome do serviço</Form.Label>
+                          <Form.Input name="name" className="" />
+                          <Form.ErrorMessage field="name" />
+                        </Form.Field>
+                      </div>
+                      <div className="table-cell text-md whitespace-nowrap text-gray-800 border-t">
+                        <Form.Field className="p-3">
+                          <Form.Label htmlFor="price">Preço</Form.Label>
+                          <Form.Input name="price" className="w-3/4" />
+                          <Form.ErrorMessage field="price" />
+                        </Form.Field>
+                      </div>
+                      <div className="table-cell text-md whitespace-nowrap px-3 font-medium border-t align-middle">
+                        <div className="flex justify-center gap-5 text-gray-500  items-center">
+
+
+                          <button
+                            className="cursor-pointer text-green-700 hover:text-green-500 disabled:cursor-progress disabled:opacity-70"
+                            type="button"
+                            onClick={handleSubmit(onSubmit)}
+                            disabled={isEditing}
+                          >
+                            <Icon icon="Check" />
+                          </button>
+                          {/* <Button text="Salvar" color="green" onClick={handleSubmit(onSubmit)} disabled={isEditing} /> */}
+
+                          <button
+                            className="cursor-pointer text-gray-500 hover:text-gray-600"
+                            type="button"
+                            onClick={() => {
+                              state.clear();
+                              reset();
+                            }}
+                          >
+                            <Icon icon="X" />
+                          </button>
+
+
+                        </div>
+                      </div>
+                    </FormProvider>
+                  </div>
+                )
+                :
+                (
+
+                  <div key={id} className="table-row">
+
+                    <div className="table-cell text-md whitespace-nowrap text-gray-800 border-t">
+                      <div className="px-3">{name}</div>
+                    </div>
+
+                    <div className="table-cell text-md whitespace-nowrap text-gray-800 border-t">
+                      <div>{formattedPrice}</div>
+                    </div>
+
+                    <div className="table-cell text-md whitespace-nowrap px-1 py-4 font-medium border-t">
+                      <div className="flex justify-center gap-5 text-gray-500 ">
                         <button
                           className="cursor-pointer hover:text-blue-700"
                           type="button"
                           onClick={() => {
+                            setValue("price", price)
+                            setValue("name", name)
                             state.setService(name, price.toString(), id);
                           }}
                         >
-                          <Pencil />
+                          <Icon icon="Pencil" />
                         </button>
 
                         <button
                           className="cursor-pointer hover:text-red-700"
                           type="button"
-                          onClick={() => handleDeleteClick( name, id )}
+                          onClick={() => handleDeleteClick(name, id)}
                         >
-                          <Trash />
+                          <Icon icon="Trash" />
                         </button>
-                      </>
-                    )}
+                      </div>
+                    </div>
                   </div>
-                </td>
-              </tr>
-            ))
+                ))
           )}
-        </tbody>
-      </table>
+        </div>
+      </div >
       <DeleteModal
-        title={"Deletar serviço "+ state.serviceToDelete?.name}
+        title={"Deletar serviço " + state.serviceToDelete?.name}
         description="Tem certeza que deseja deletar este serviço?"
         open={modalOpen}
         onOpenChange={handleModalClose}
