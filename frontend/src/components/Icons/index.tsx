@@ -13,6 +13,7 @@ import { Trash } from "./Trash"
 import { User } from "./User"
 import { Users } from "./Users"
 import { X } from "./X"
+import { ArrowLeft } from "./ArrowLeft"
 
 const CustomIcon = {
   ChartPie,
@@ -28,7 +29,8 @@ const CustomIcon = {
   Trash,
   User,
   Users,
-  X
+  X,
+  ArrowLeft
 }
 
 
