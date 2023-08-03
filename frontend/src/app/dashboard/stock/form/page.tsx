@@ -89,6 +89,11 @@ export default function CreateProductForm() {
           Cadastro
         </h1>
       </div>
+      <div className="mb-8 flex items-end gap-3">
+        <h1 className=" flex items-center gap-5 text-3xl text-gray-700">
+          <Icon icon="ArrowLeft" className="h-9 w-9 text-gray-500" />
+        </h1>
+      </div>
 
       <FormProvider {...CreateProductForm}>
         <form className="flex justify-between" onSubmit={handleSubmit(onSubmit)}>
@@ -108,7 +113,6 @@ export default function CreateProductForm() {
           </div>
 
           <div className="flex gap-4 mt-7">
-            <Button text="Cancelar" type="button" color="gray" onClick={close} />
             <Button text="Cadastrar" type="submit" disabled={isMutating} />
           </div>
 
