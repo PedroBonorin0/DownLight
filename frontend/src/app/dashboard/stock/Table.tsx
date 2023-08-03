@@ -156,10 +156,6 @@ export function Table({ filter }: Props) {
     mutateDelete(productSelected.id);
   }
 
-  if (products?.length === 0) {
-    return <div>no data</div>
-  }
-
   return (
     <>
       <div className="table w-full border rounded">

@@ -14,6 +14,8 @@ import { User } from "./User"
 import { Users } from "./Users"
 import { X } from "./X"
 import { ArrowLeft } from "./ArrowLeft"
+import { EmptyFolder } from "./EmptyFolder"
+import { twMerge } from "tailwind-merge"
 
 const CustomIcon = {
   ChartPie,
@@ -30,7 +32,8 @@ const CustomIcon = {
   User,
   Users,
   X,
-  ArrowLeft
+  ArrowLeft,
+  EmptyFolder
 }
 
 
@@ -41,5 +44,5 @@ interface Props {
   className?: string
 }
 export function Icon({ icon, className }: Props) {
-  return createElement(CustomIcon[icon], { className: className ?? "w-6 h-6" })
+  return createElement(CustomIcon[icon], { className: twMerge("w-6 h-6", className) })
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/Button";
+import { Checkbox } from "@/components/Checkbox";
 import { Form } from "@/components/Form";
 import { Icon } from "@/components/Icons";
 import { useQueryProduct } from "@/hooks/useQueryProduct";
@@ -8,6 +9,7 @@ import { backend } from "@/lib/axios";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
@@ -90,18 +92,18 @@ export default function CreateProductForm() {
         </h1>
       </div>
       <div className="mb-8 flex items-end gap-3">
-        <h1 className=" flex items-center gap-5 text-3xl text-gray-700">
-          <Icon icon="ArrowLeft" className="h-9 w-9 text-gray-500" />
-        </h1>
+        <Link href="dashboard/stock" className=" flex items-center gap-5 text-3xl text-gray-700 hover:opacity-80">
+          <Icon icon="ArrowLeft" className="h-9 w-9 " />
+        </Link>
       </div>
 
       <FormProvider {...CreateProductForm}>
-        <form className="flex justify-between" onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex gap-4">
+        <form className="flex gap-20" onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex flex-col gap-6">
 
             <Form.Field>
-              <Form.Label>Nome do serviço</Form.Label>
-              <Form.Input name="name" className="w-64" />
+              <Form.Label>Nome do produto</Form.Label>
+              <Form.Input name="name" className="w-96" />
               <Form.ErrorMessage field="name" />
             </Form.Field>
 
@@ -110,12 +112,35 @@ export default function CreateProductForm() {
               <Form.Input name="price" placeholder="00.00" />
               <Form.ErrorMessage field="price" />
             </Form.Field>
-          </div>
 
-          <div className="flex gap-4 mt-7">
-            <Button text="Cadastrar" type="submit" disabled={isMutating} />
-          </div>
+            <Form.Field>
+              <Form.Label>Quantidade</Form.Label>
+              <Form.Input name="amount" />
+              <Form.ErrorMessage field="amount" />
+            </Form.Field>
 
+
+            <Button text="Salvar" type="submit" disabled={isMutating} className="w-min" />
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-24">
+              <Form.Label className="text-xl">Categorias</Form.Label>
+              <Icon icon="Settings" className="text-gray-600" />
+            </div>
+            <div>
+              <div className="items-center flex space-x-3">
+                <Checkbox id="terms1" />
+
+                <label
+                  htmlFor="terms1"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Accept terms and conditions
+                </label>
+              </div>
+
+            </div>
+          </div>
         </form>
       </FormProvider>
     </div>
