@@ -14,6 +14,7 @@ import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 import { useState } from "react";
 import { Form } from '@/components/Form'
 import { Icon } from "@/components/Icons";
+import { NoData } from "@/components/NoData";
 
 interface Props {
   filter: string
@@ -143,6 +144,14 @@ export function Table({ filter }: Props) {
   async function handleDeleteAction() {
     mutateDelete(state.serviceToDelete?.id!);
   }
+
+  // if (services?.length === 0) {
+  //   return (
+  //     <NoData title="Nenhum serviço" message="Adicione um serviço para ele aparecer aqui.">
+
+  //     </NoData>
+  //   )
+  // }
 
   return (
     <>
