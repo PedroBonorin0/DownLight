@@ -6,6 +6,8 @@ import { authenticate } from './controllers/authenticate';
 import { profile } from './controllers/profile';
 import { listAllServices, createService, editService, deleteService } from './controllers/service';
 import { listAllProducts, createProduct, editProduct, deleteProduct } from './controllers/product';
+import { createOrder, deleteOrder, listAllOrders } from './controllers/order';
+import { createStatus, listAllStatus } from './controllers/status';
 
 export async function appRoutes(app: FastifyInstance) {
   app.post('/users', register);
@@ -17,11 +19,20 @@ export async function appRoutes(app: FastifyInstance) {
   app.put('/services/:id', editService);
   app.delete('/services/:id', deleteService);
 
-  // Produtos
+  // Products
   app.post('/products', createProduct);
   app.get('/products', listAllProducts);
   app.put('/products/:id', editProduct);
   app.delete('/products/:id', deleteProduct);
+
+  // Orders
+  app.post('/orders', createOrder)
+  app.get('/orders', listAllOrders)
+  app.delete('/orders/:id', deleteOrder);
+
+  //Status
+  app.post('/status', createStatus)
+  app.get('/status', listAllStatus)
 
   /* Authenticated */
   app.get('/me', { onRequest: [verifyJWT] }, profile);

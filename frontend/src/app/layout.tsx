@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${roboto.className} flex h-screen flex-col`}>
+      <body className={`${roboto.className} flex h-screen flex-col bg-gray-50`}>
         <AuthProvider>
           <QueryProvider>{children}</QueryProvider>
         </AuthProvider>

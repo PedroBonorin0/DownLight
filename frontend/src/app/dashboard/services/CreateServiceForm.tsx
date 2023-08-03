@@ -1,27 +1,36 @@
 "use client";
 
 import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
 import { useQueryService } from "@/hooks/useQueryService";
 import { backend } from "@/lib/axios";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Controller, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import { Form } from "@/components/Form"
 
-export function Form() {
+interface Props {
+  close: () => void
+}
+
+export function CreateServiceForm({ close }: Props) {
   const ServiceSchema = z.object({
-    name: z.string().min(4),
-    price: z.string().min(1),
+    name: z.string().min(4, "O nome deve conter no mínimo 4 letras"),
+    price: z.coerce
+      .number({ invalid_type_error: "Valor deve ser um número" })
+      .nonnegative("Valor não pode ser negativo")
+      .default(0)
   });
 
   type ServiceData = z.infer<typeof ServiceSchema>;
 
-  const { control, handleSubmit, reset } = useForm<ServiceData>({
+  const CreateServiceForm = useForm<ServiceData>({
     resolver: zodResolver(ServiceSchema),
   });
+
+  const { reset, handleSubmit } = CreateServiceForm;
 
   const queryClient = useQueryClient();
   const { refetch } = useQueryService();
@@ -69,43 +78,29 @@ export function Form() {
   }
 
   return (
-    <form className="flex items-end gap-3" onSubmit={handleSubmit(onSubmit)}>
-      <Controller
-        defaultValue=""
-        name="name"
-        control={control}
-        render={({ field: { onChange, onBlur, value, ref } }) => (
-          <Input
-            id="service-name"
-            type="text"
-            placeholder="Nome"
-            onChange={onChange}
-            onBlur={onBlur}
-            value={value}
-            forwardRef={ref}
-          />
-        )}
-      />
-      <Controller
-        defaultValue=""
-        name="price"
-        control={control}
-        render={({ field: { onChange, onBlur, value, ref } }) => (
-          <Input
-            id="price"
-            type="text"
-            placeholder="Preço"
-            onChange={onChange}
-            onBlur={onBlur}
-            value={value}
-            forwardRef={ref}
-          />
-        )}
-      />
+    <FormProvider {...CreateServiceForm}>
+      <form className="flex justify-between" onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex gap-4">
 
-      <div className="flex items-end gap-2">
-        <Button text="Cadastrar" type="submit" disabled={isMutating} />
-      </div>
-    </form>
+          <Form.Field>
+            <Form.Label>Nome do serviço</Form.Label>
+            <Form.Input name="name" className="w-64" />
+            <Form.ErrorMessage field="name" />
+          </Form.Field>
+
+          <Form.Field>
+            <Form.Label>Preço</Form.Label>
+            <Form.Input name="price" placeholder="00.00" />
+            <Form.ErrorMessage field="price" />
+          </Form.Field>
+        </div>
+
+        <div className="flex gap-4 mt-7">
+          <Button text="Cancelar" type="button" color="gray" onClick={close} />
+          <Button text="Cadastrar" type="submit" disabled={isMutating} />
+        </div>
+
+      </form>
+    </FormProvider>
   );
 }

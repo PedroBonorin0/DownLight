@@ -12,19 +12,140 @@ model Service {
   name       String   @unique
   price      Decimal  @db.Decimal(5, 2)
   created_at DateTime @default(now())
+
+  orders ServicesInOrder[]
+
+  @@map("services")
 }
 
 model Product {
-  id         String   @id @default(uuid())
-  name       String   @unique
-  price      Decimal  @db.Decimal(5, 2)
-  amount     Int      @default(0)
-  created_at DateTime @default(now())
+  id         String            @id @default(uuid())
+  name       String            @unique
+  price      Decimal           @db.Decimal(5, 2)
+  amount     Int               @default(0)
+  created_at DateTime          @default(now())
+  orders     ProductsInOrder[]
+
+  @@map("products")
 }
 
-enum Role {
-  ADMIN
-  MEMBER
+model Status {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  color      String
+  created_at DateTime @default(now())
+
+  permissions StatusPermission[] @default([DELETE, EDIT])
+  orders      Order[]
+
+  @@map("status")
+}
+
+enum StatusPermission {
+  DELETE
+  EDIT
+}
+
+model PaymentMethod {
+  id                    String                  @id @default(uuid())
+  name                  String
+  PaymentMethodsInOrder PaymentMethodsInOrder[]
+
+  @@map("payment_methods")
+}
+
+model Car {
+  id            String       @id @default(uuid())
+  license_plate String?      @unique
+  owners        ClientCars[]
+  Order         Order[]
+
+  @@map("cars")
+}
+
+model ClientCars {
+  car       Car    @relation(fields: [car_id], references: [id])
+  client    Client @relation(fields: [client_id], references: [id])
+  car_id    String
+  client_id String
+
+  @@id([client_id, car_id])
+  @@map("client_cars")
+}
+
+model Client {
+  id    String       @id @default(uuid())
+  cpf   String?      @unique
+  name  String?
+  phone String?
+  cars  ClientCars[]
+
+  @@map("clients")
+}
+
+model Order {
+  id            String    @id @default(uuid())
+  number        Int       @unique @default(autoincrement())
+  description   String
+  paid_at       DateTime?
+  budget        Decimal   @db.Decimal(5, 2)
+  signal        Decimal   @db.Decimal(5, 2)
+  total_price   Decimal   @db.Decimal(5, 2)
+  discount      Int       @default(0)
+  expected_date DateTime?
+  created_at    DateTime  @default(now())
+  car_id        String
+  user_id       String
+  status_id     String
+
+  services        ServicesInOrder[]
+  products        ProductsInOrder[]
+  payment_methods PaymentMethodsInOrder[]
+
+  priority Priority @default(LOW)
+  car      Car      @relation(fields: [car_id], references: [id])
+  employee User     @relation(fields: [user_id], references: [id])
+  status   Status   @relation(fields: [status_id], references: [id])
+
+  @@map("orders")
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model ServicesInOrder {
+  order_id   String
+  service_id String
+
+  order   Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [service_id], references: [id], onDelete: Cascade)
+
+  @@id([order_id, service_id])
+  @@map("services_in_order")
+}
+
+model ProductsInOrder {
+  order_id   String
+  product_id String
+
+  order   Order   @relation(fields: [order_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@id([product_id, order_id])
+  @@map("products_in_order")
+}
+
+model PaymentMethodsInOrder {
+  order             Order         @relation(fields: [order_id], references: [id])
+  payment_method    PaymentMethod @relation(fields: [payment_method_id], references: [id])
+  order_id          String
+  payment_method_id String
+
+  @@id([payment_method_id, order_id])
+  @@map("payment_methods_in_order")
 }
 
 model User {
@@ -35,4 +156,12 @@ model User {
   avatar_url String
   role       Role     @default(MEMBER)
   created_at DateTime @default(now())
+  Order      Order[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
 }
