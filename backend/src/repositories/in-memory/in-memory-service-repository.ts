@@ -20,7 +20,7 @@ export class InMemoryServiceRepository implements ServicesRepository {
   }
   
   async delete(id: string) {
-    this.items.filter(item=>item.id !== id);
+    this.items = this.items.filter(item=>item.id !== id);
   }
 
   async findByNameAndIdNotEqual(name: string, id: string){
