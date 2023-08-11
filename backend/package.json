@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "node build/server.js",
-    "build": "tsup src --out-dir build"
+    "build": "tsup src --out-dir build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui"
   },
   "keywords": [],
   "author": "",
@@ -14,11 +18,14 @@
   "devDependencies": {
     "@types/bcryptjs": "2.4.2",
     "@types/node": "20.2.1",
+    "@vitest/ui": "0.34.1",
     "eslint": "8.40.0",
     "prisma": "4.14.1",
     "tsup": "6.7.0",
     "tsx": "3.12.7",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "vite-tsconfig-paths": "4.2.0",
+    "vitest": "0.34.1"
   },
   "dependencies": {
     "@fastify/cors": "8.3.0",
