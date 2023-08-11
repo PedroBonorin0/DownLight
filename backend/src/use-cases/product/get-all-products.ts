@@ -12,10 +12,6 @@ export class GetAllProductsUseCase {
   async execute(): Promise<GetAllProductsUseCaseResponse> {
     const products = await this.productsRepository.findAll();
 
-    if (!products) {
-      throw new ResourceNotFoundError();
-    }
-
     return {
       products,
     };

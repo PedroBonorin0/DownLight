@@ -31,10 +31,6 @@ export class CreateStatusUseCase {
     }
     const status = await this.statusRepository.create({ name, color, permissions });
 
-    if (!status) {
-      throw new ResourceNotFoundError();
-    }
-
     return {
       status,
     };

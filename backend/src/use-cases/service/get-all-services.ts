@@ -13,10 +13,6 @@ export class GetAllServicesUseCase {
 
     const services = await this.servicesRepository.findAll();
 
-    if (!services) {
-      throw new ResourceNotFoundError();
-    }
-
     return {
       services,
     };

@@ -3,6 +3,7 @@ import { describe, expect, it,beforeEach } from 'vitest'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 import { EditProductUseCase } from './edit-product'
 import { InMemoryProductRepository } from '@/repositories/in-memory/in-memory-product-repository'
+import { ProductAlreadyExistsError } from '../errors/product-already-exists-error'
 
 let productRepository: InMemoryProductRepository
 let sut: EditProductUseCase
@@ -49,5 +50,28 @@ describe("Edit Product Use Case", ()=>{
         amount: 1
       }))
     .rejects.toBeInstanceOf(ResourceNotFoundError)
+  })
+
+  it('should not be able to edit to an existing name', async()=>{
+    const name = 'Product 2'
+    
+    const productToEdit = await productRepository.create({
+      name: 'Product 1',
+      price: 14,
+    })
+    
+    productRepository.create({
+      name,
+      price: 14,
+    })
+    
+    await expect(()=>sut.execute(
+      {
+        id: productToEdit.id, 
+        name, 
+        price: 1,
+        amount: 0
+      }))
+      .rejects.toBeInstanceOf(ProductAlreadyExistsError)
   })
 })
