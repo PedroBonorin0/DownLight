@@ -8,6 +8,7 @@ import { listAllServices, createService, editService, deleteService } from './co
 import { listAllProducts, createProduct, editProduct, deleteProduct } from './controllers/product';
 import { createOrder, deleteOrder, listAllOrders } from './controllers/order';
 import { createStatus, listAllStatus } from './controllers/status';
+import { createCategory, deleteCategory, editCategory, listAllCategories } from './controllers/category';
 
 export async function appRoutes(app: FastifyInstance) {
   app.post('/users', register);
@@ -33,6 +34,12 @@ export async function appRoutes(app: FastifyInstance) {
   //Status
   app.post('/status', createStatus)
   app.get('/status', listAllStatus)
+
+  //Category
+  app.post('/categories', createCategory);
+  app.get('/categories', listAllCategories);
+  app.put('/categories/:id', editCategory);
+  app.delete('/categories/:id', deleteCategory);
 
   /* Authenticated */
   app.get('/me', { onRequest: [verifyJWT] }, profile);
