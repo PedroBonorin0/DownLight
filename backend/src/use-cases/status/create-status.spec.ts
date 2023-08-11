@@ -7,7 +7,7 @@ import { StatusAlreadyExistsError } from '../errors/status-already-exists-error'
 let statusRepository: InMemoryStatusRepository
 let sut: CreateStatusUseCase
 
-describe("Register Use Case",()=>{
+describe("Create Status Use Case",()=>{
   beforeEach(()=>{
     statusRepository = new InMemoryStatusRepository()
     sut = new CreateStatusUseCase(statusRepository)
