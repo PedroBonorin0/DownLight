@@ -1,6 +1,5 @@
 import { ServicesRepository } from "@/repositories/services-repository";
 import { Service } from "@prisma/client";
-import { ResourceNotFoundError } from "@/use-cases/errors/resource-not-found-error";
 import { ServiceAlreadyExistsError } from "../errors/service-already-exists-error";
 
 interface GetUserProfileUseCaseRequest {
@@ -25,10 +24,6 @@ export class CreateServiceUseCase {
       throw new ServiceAlreadyExistsError();
     }
     const service = await this.servicesRepository.create({ name, price });
-
-    if (!service) {
-      throw new ResourceNotFoundError();
-    }
 
     return {
       service,
