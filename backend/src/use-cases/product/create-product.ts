@@ -28,10 +28,6 @@ export class CreateProductUseCase {
     }
     const product = await this.productsRepository.create({ name, price, amount });
 
-    if (!product) {
-      throw new ResourceNotFoundError();
-    }
-
     return {
       product,
     };

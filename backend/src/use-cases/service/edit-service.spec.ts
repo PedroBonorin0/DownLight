@@ -3,6 +3,7 @@ import { describe, expect, it,beforeEach } from 'vitest'
 import { InMemoryServiceRepository } from '@/repositories/in-memory/in-memory-service-repository'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 import { EditServiceUseCase } from './edit-service'
+import { ServiceAlreadyExistsError } from '../errors/service-already-exists-error'
 
 let serviceRepository: InMemoryServiceRepository
 let sut: EditServiceUseCase
@@ -47,5 +48,27 @@ describe("Edit Service Use Case", ()=>{
         price: 1
       }))
       .rejects.toBeInstanceOf(ResourceNotFoundError)
+  })
+
+  it('should not be able to edit to an existing name', async()=>{
+    const name = 'Service 2'
+    
+    const serviceToEdit = await serviceRepository.create({
+      name: 'Service 1',
+      price: 14,
+    })
+    
+    serviceRepository.create({
+      name,
+      price: 14,
+    })
+    
+    await expect(()=>sut.execute(
+      {
+        id: serviceToEdit.id, 
+        name, 
+        price: 1
+      }))
+      .rejects.toBeInstanceOf(ServiceAlreadyExistsError)
   })
 })
