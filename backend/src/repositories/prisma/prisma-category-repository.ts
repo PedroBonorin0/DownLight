@@ -4,6 +4,20 @@ import { CategoryRepository } from "../category-repository";
 
 
 export class PrismaCategoryRepository implements CategoryRepository {
+  
+  async findAllByIds(ids: string[]) {
+    const categories = await prisma.category.findMany({
+      where: {
+        id: {
+          in: ids
+        }
+      }
+    })
+
+    return categories
+
+  }
+  
   async findAll() {
     const allCategories = await prisma.category.findMany({
       orderBy: { created_at: "desc" },

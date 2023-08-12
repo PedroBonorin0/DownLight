@@ -5,6 +5,10 @@ import { CategoryRepository } from '../category-repository'
 
 export class InMemoryCategoryRepository implements CategoryRepository {
   public items: Category[] = []
+  
+  async findAllByIds(ids: string[]) {
+    return this.items.filter(item=> ids.includes(item.id))
+  }
 
   async edit(data: { name: string; id: string; }) {
     const categoryIndex = this.items.findIndex((item) => item.id === data.id)

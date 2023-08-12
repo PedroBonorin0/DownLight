@@ -1,12 +1,14 @@
 import { ProductsRepository } from "@/repositories/products-repository";
 import { Product } from "@prisma/client";
-import { ResourceNotFoundError } from "@/use-cases/errors/resource-not-found-error";
 import { ProductAlreadyExistsError } from "../errors/product-already-exists-error";
+import { CategoryRepository } from "@/repositories/category-repository";
+import { ResourceNotFoundError } from "../errors/resource-not-found-error";
 
 interface CreateProductUseCaseRequest {
   name: string;
   price: number;
   amount: number;
+  categories: string[]
 }
 
 interface CreateProductUseCaseResponse {
@@ -14,19 +16,30 @@ interface CreateProductUseCaseResponse {
 }
 
 export class CreateProductUseCase {
-  constructor(private productsRepository: ProductsRepository) { }
+  constructor(
+    private productsRepository: ProductsRepository,
+    private categoryRepository: CategoryRepository
+    ) { }
 
   async execute({
     name,
     price,
-    amount
+    amount,
+    categories
   }: CreateProductUseCaseRequest): Promise<CreateProductUseCaseResponse> {
     const productWithSameName = await this.productsRepository.findByName(name);
 
     if (productWithSameName) {
       throw new ProductAlreadyExistsError();
     }
-    const product = await this.productsRepository.create({ name, price, amount });
+
+    const categoriesSelected = await this.categoryRepository.findAllByIds(categories)
+
+    if(categoriesSelected.length < categories.length){
+      throw new ResourceNotFoundError()
+    }
+
+    const product = await this.productsRepository.create({ name, price, amount, categories });
 
     return {
       product,

@@ -8,4 +8,5 @@ export interface CategoryRepository {
   delete(id:string):Promise<void>
   findByNameAndIdNotEqual(name: string, id: string): Promise<Category | null>;
   edit(data: { name: string; id: string }): Promise<Category>;
+  findAllByIds(ids: string[]): Promise<Category[]>
 }
