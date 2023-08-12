@@ -7,6 +7,7 @@ import { GetAllProductsUseCase } from "@/use-cases/product/get-all-products";
 import { EditProductUseCase } from "@/use-cases/product/edit-product";
 import { DeleteProductUseCase } from "@/use-cases/product/delete-product";
 import { ResourceNotFoundError } from "@/use-cases/errors/resource-not-found-error";
+import { PrismaCategoryRepository } from "@/repositories/prisma/prisma-category-repository";
 
 export async function listAllProducts(
   _request: FastifyRequest,
@@ -27,23 +28,29 @@ export async function createProduct(
   const createProductBodySchema = z.object({
     name: z.string(),
     price: z.number(),
-    amount: z.number()
+    amount: z.number(),
+    categories: z.array(z.string().uuid()).default([])
   });
 
-  const { name, price, amount } = createProductBodySchema.parse(request.body);
+  const { name, price, amount, categories } = createProductBodySchema.parse(request.body);
 
   try {
     const productsRepository = new PrismaProductsRepository();
-    const createProductUseCase = new CreateProductUseCase(productsRepository);
+    const categoryRepository = new PrismaCategoryRepository();
+    const createProductUseCase = new CreateProductUseCase(productsRepository, categoryRepository);
 
     await createProductUseCase.execute({
       name,
       price,
-      amount
+      amount,
+      categories
     });
   } catch (err) {
     if (err instanceof ProductAlreadyExistsError) {
       return reply.status(409).send({ message: err.message });
+    }
+    if(err instanceof ResourceNotFoundError){
+      return reply.status(400).send({ message: err.message });
     }
     throw err;
   }
@@ -58,30 +65,36 @@ export async function editProduct(
   const editProductBodySchema = z.object({
     name: z.string(),
     price: z.number(),
-    amount: z.number()
+    amount: z.number(),
+    categories: z.array(z.string().uuid()).default([])
   });
 
   const editProductParamsSchema = z.object({
     id: z.string(),
   });
 
-  const { name, price, amount } = editProductBodySchema.parse(request.body);
+  const { name, price, amount, categories } = editProductBodySchema.parse(request.body);
 
   const { id } = editProductParamsSchema.parse(request.params);
 
   try {
     const productsRepository = new PrismaProductsRepository();
-    const editProductUseCase = new EditProductUseCase(productsRepository);
+    const categoryRepository = new PrismaCategoryRepository();
+    const editProductUseCase = new EditProductUseCase(productsRepository,categoryRepository);
 
     await editProductUseCase.execute({
       name,
       price,
       amount,
       id,
+      categories
     });
   } catch (err) {
     if (err instanceof ProductAlreadyExistsError) {
       return reply.status(409).send({ message: err.message });
+    }
+    if(err instanceof ResourceNotFoundError){
+      return reply.status(400).send({ message: err.message });
     }
     throw err;
   }
@@ -108,7 +121,7 @@ export async function deleteProduct(
     });
   } catch (err) {
     if (err instanceof ResourceNotFoundError) {
-      return reply.status(409).send({ message: err.message });
+      return reply.status(400).send({ message: err.message });
     }
     throw err;
   }

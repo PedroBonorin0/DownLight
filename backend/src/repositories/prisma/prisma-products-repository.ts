@@ -1,31 +1,58 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
-import { ProductsRepository } from "../products-repository";
+import { Category, Prisma } from "@prisma/client";
+import { ProductCreateInput, ProductEditInput, ProductsRepository } from "../products-repository";
 
 export class PrismaProductsRepository implements ProductsRepository {
   async findAll() {
     const allProducts = await prisma.product.findMany({
       orderBy: { created_at: "desc" },
+      include: {categories:true}
     });
 
     return allProducts;
   }
 
-  async create(data: Prisma.ProductCreateInput) {
+  async create(data: ProductCreateInput) {
+    
+    const {
+      name,
+      price,
+      amount,
+      categories } = data;
+
     const product = await prisma.product.create({
-      data,
+      data: {
+        name,
+        price,
+        amount,
+        categories: {
+          create: categories.map((category_id) => {
+            return { category: { connect: { id: category_id } } }
+          })
+        },
+      }
     });
 
     return product;
   }
 
-  async edit(data: { name: string; price: number; amount: number; id: string }) {
+  async edit(data: ProductEditInput) {
     const product = await prisma.product.update({
       where: { id: data.id },
       data: {
         name: data.name,
         price: data.price,
-        amount: data.amount
+        amount: data.amount,
+        categories: {
+          create: data.categoriesToAdd.map((category_id) => {
+            return { category: { connect: { id: category_id } } }
+          }),
+          deleteMany: {
+            category_id: {
+              in: data.categoriesToRemove
+            }
+          }
+        },
       },
     });
 
@@ -66,8 +93,41 @@ export class PrismaProductsRepository implements ProductsRepository {
       where: {
         id,
       },
+      include: {
+        categories: {
+          include: {
+            category: true
+          }
+        }
+      }
     });
 
     return product;
   }
+  
+  async findRelatedCategories(id: string) {
+    const categories = await prisma.category.findMany({
+     where: {
+      products: {
+        some: {
+          product_id: id
+        }
+      }
+     },
+     select: {
+      id:true
+     }
+    })
+    
+    if(!categories){
+      return []
+    }
+
+    const categoryArray = categories.map(category=>{
+      return category.id
+    })
+
+    return categoryArray
+  }
+
 }

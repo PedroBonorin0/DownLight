@@ -19,14 +19,34 @@ model Service {
 }
 
 model Product {
-  id         String            @id @default(uuid())
-  name       String            @unique
-  price      Decimal           @db.Decimal(5, 2)
-  amount     Int               @default(0)
-  created_at DateTime          @default(now())
+  id         String              @id @default(uuid())
+  name       String              @unique
+  price      Decimal             @db.Decimal(5, 2)
+  amount     Int                 @default(0)
+  created_at DateTime            @default(now())
   orders     ProductsInOrder[]
+  categories ProductCategories[]
 
   @@map("products")
+}
+
+model ProductCategories {
+  product     Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  category    Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  product_id  String
+  category_id String
+
+  @@id([product_id, category_id])
+  @@map("product_categories")
+}
+
+model Category {
+  id         String              @id @default(uuid())
+  name       String              @unique
+  created_at DateTime            @default(now())
+  products   ProductCategories[]
+
+  @@map("categories")
 }
 
 model Status {

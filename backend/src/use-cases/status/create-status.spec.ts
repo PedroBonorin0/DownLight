@@ -30,7 +30,7 @@ describe("Create Status Use Case",()=>{
     })).rejects.toBeInstanceOf(StatusAlreadyExistsError)
   })
 
-  it('should be able to register', async()=>{
+  it('should be able to create status', async()=>{
     const { status } = await sut.execute({
       name: "Status Name",
       color: 'red',

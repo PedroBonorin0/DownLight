@@ -1,19 +1,39 @@
 import { Prisma, Product } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
-import { ProductsRepository } from '../products-repository';
+import { ProductCreateInput, ProductEditInput, ProductsRepository } from '../products-repository';
+
+
+interface ProductInterface extends Product {
+  categories: string[]
+}
 
 export class InMemoryProductRepository implements ProductsRepository {
-  public items: Product[] = []
+  public items: ProductInterface[] = []
   
-  async edit(data: { name: string; price: number; id: string; amount:number }) {
+  async findRelatedCategories(id: string){
+    const product = this.items.find(item=> item.id === id)
+
+    if(!product){
+      return []
+    }
+
+    return product.categories
+  }
+  
+  async edit(data: ProductEditInput) {
     const productIndex = this.items.findIndex((item) => item.id === data.id)
+
+    const newCategories = this.items[productIndex].categories
+    .filter(category=>!data.categoriesToRemove.includes(category))
+    .concat(data.categoriesToAdd)
 
     if (productIndex >= 0) {
       this.items[productIndex] = {
         ...this.items[productIndex],
         name: data.name,
         price: new Prisma.Decimal(data.price),
-        amount: data.amount
+        amount: data.amount,
+        categories: newCategories
       }
     }
 
@@ -54,14 +74,15 @@ export class InMemoryProductRepository implements ProductsRepository {
     return products
   }
 
-  async create(data: Prisma.ProductCreateInput){
+  async create(data: ProductCreateInput){
 
     const product = {
       id: randomUUID(),
       name: data.name,
       price: new Prisma.Decimal( data.price.toString()),
       created_at: new Date(),
-      amount: data.amount ?? 0
+      amount: data.amount ?? 0,
+      categories: data.categories
     }
 
     this.items.push(product)
