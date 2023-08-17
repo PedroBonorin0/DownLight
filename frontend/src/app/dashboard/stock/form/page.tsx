@@ -10,7 +10,7 @@ import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 
@@ -25,15 +25,78 @@ export default function CreateProductForm() {
       .number({ invalid_type_error: "Valor deve ser um número" })
       .nonnegative("Valor não pode ser negativo")
       .default(0),
+    categories: z.array(z.string()).refine((value) => value.some((item) => item), {
+      message: "Você deve selecionar no mínimo 1 categoria",
+    }),
   });
 
   type ProductData = z.infer<typeof ProductSchema>;
 
   const CreateProductForm = useForm<ProductData>({
     resolver: zodResolver(ProductSchema),
+    defaultValues: {
+      categories: [],
+    },
   });
 
   const { handleSubmit, reset } = CreateProductForm
+
+
+  const categorias = [
+    {
+      id: "1",
+      name: "categoria 1"
+    },
+    {
+      id: "2",
+      name: "categoria 2"
+    },
+    {
+      id: "3",
+      name: "categoria 3"
+    },
+    {
+      id: "4",
+      name: "categoria 3"
+    },
+    {
+      id: "5",
+      name: "categoria 3"
+    },
+    {
+      id: "6",
+      name: "categoria 3"
+    },
+    {
+      id: "7",
+      name: "categoria 3"
+    }, {
+      id: "8",
+      name: "categoria 3"
+    },
+    {
+      id: "9",
+      name: "categoria 3"
+    },
+    {
+      id: "10",
+      name: "categoria 3"
+    },
+    {
+      id: "11",
+      name: "categoria 3"
+    },
+    {
+      id: "12",
+      name: "categoria 3"
+    },
+    {
+      id: "13",
+      name: "categoria 3"
+    },
+  ]
+
+
 
   const queryClient = useQueryClient();
   const { refetch } = useQueryProduct();
@@ -122,22 +185,47 @@ export default function CreateProductForm() {
 
             <Button text="Salvar" type="submit" disabled={isMutating} className="w-min" />
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-5">
             <div className="flex items-center gap-24">
-              <Form.Label className="text-xl">Categorias</Form.Label>
-              <Icon icon="Settings" className="text-gray-600" />
+              <Form.Label>Categorias</Form.Label>
+              <Icon icon="Settings" className="text-gray-800 w-5 h-5 hover:text-gray-600 hover:cursor-pointer" />
             </div>
             <div>
-              <div className="items-center flex space-x-3">
-                <Checkbox id="terms1" />
-
-                <label
-                  htmlFor="terms1"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Accept terms and conditions
-                </label>
+              <div className="flex flex-col gap-3 h-64 overflow-y-scroll">
+                {categorias.map(item => (
+                  <div className="items-center flex space-x-3" key={item.id}>
+                    <Controller
+                      key={item.id}
+                      name="categories"
+                      control={CreateProductForm.control}
+                      render={({ field }) => {
+                        return (
+                          <Checkbox
+                            id={item.id}
+                            checked={field.value?.includes(item.id)}
+                            onCheckedChange={(checked) => {
+                              return checked
+                                ? field.onChange([...field.value, item.id])
+                                : field.onChange(
+                                  field.value?.filter(
+                                    (value) => value !== item.id
+                                  )
+                                )
+                            }}
+                          />
+                        )
+                      }}
+                    />
+                    <label
+                      htmlFor={item.id}
+                      className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {item.name}
+                    </label>
+                  </div>
+                ))}
               </div>
+              <Form.ErrorMessage field="categories" />
 
             </div>
           </div>
