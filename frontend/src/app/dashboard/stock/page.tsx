@@ -12,6 +12,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { NoData } from "@/components/NoData";
+import StockForm from "./StockForm";
 
 export default function Stock() {
   const { isFetching, isLoading, isRefetching, refetch, data: products } = useQueryProduct();
@@ -41,9 +42,10 @@ export default function Stock() {
       </div>
       {products?.length === 0 ?
         <NoData title="Nenhum produto" message="Adicione um produto para ele aparecer aqui.">
-          <Link href={'dashboard/stock/form'}>
+          {/* <Link href={'dashboard/stock/form'}>
             <Button text="Novo Produto" type="button" />
-          </Link>
+          </Link> */}
+          <StockForm />
         </NoData>
         :
         <>

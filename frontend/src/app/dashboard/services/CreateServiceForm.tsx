@@ -10,12 +10,10 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { Form } from "@/components/Form"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/Dialog";
+import { useState } from "react";
 
-interface Props {
-  close: () => void
-}
-
-export function CreateServiceForm({ close }: Props) {
+export function CreateServiceForm() {
   const ServiceSchema = z.object({
     name: z.string().min(4, "O nome deve conter no mínimo 4 letras"),
     price: z.coerce
@@ -75,32 +73,78 @@ export function CreateServiceForm({ close }: Props) {
 
   async function onSubmit(data: ServiceData) {
     mutate(data);
+    handleModalClose();
   }
+  const [modalOpen, setModalOpen] = useState(false)
+
+  function handleModalClose() {
+    setModalOpen(false)
+  }
+  // return (
+  //   <FormProvider {...CreateServiceForm}>
+  //     <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+
+  //       <Form.Field>
+  //         <Form.Label>Nome do serviço</Form.Label>
+  //         <Form.Input name="name" />
+  //         <Form.ErrorMessage field="name" />
+  //       </Form.Field>
+
+  //       <Form.Field>
+  //         <Form.Label>Preço</Form.Label>
+  //         <Form.Input name="price" />
+  //         <Form.ErrorMessage field="price" />
+  //       </Form.Field>
+
+
+  //       <div className="flex gap-4 mt-7">
+  //         <Button text="Cancelar" type="button" color="gray" onClick={close} />
+  //         <Button text="Cadastrar" type="submit" disabled={isMutating} />
+  //       </div>
+
+  //     </form>
+  //   </FormProvider>
+  // );
+
 
   return (
-    <FormProvider {...CreateServiceForm}>
-      <form className="flex justify-between" onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex gap-4">
 
-          <Form.Field>
-            <Form.Label>Nome do serviço</Form.Label>
-            <Form.Input name="name" className="w-64" />
-            <Form.ErrorMessage field="name" />
-          </Form.Field>
+    <Dialog open={modalOpen} onOpenChange={setModalOpen} modal>
+      <DialogTrigger asChild>
+        <Button text="Novo Serviço" type="button" />
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Criar serviço</DialogTitle>
+          <DialogDescription >
+            Adicione um novo serviço para oferecer a seus clientes.
+          </DialogDescription>
+        </DialogHeader>
 
-          <Form.Field>
-            <Form.Label>Preço</Form.Label>
-            <Form.Input name="price" placeholder="00.00" />
-            <Form.ErrorMessage field="price" />
-          </Form.Field>
-        </div>
+        <FormProvider {...CreateServiceForm}>
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
 
-        <div className="flex gap-4 mt-7">
-          <Button text="Cancelar" type="button" color="gray" onClick={close} />
-          <Button text="Cadastrar" type="submit" disabled={isMutating} />
-        </div>
+            <Form.Field>
+              <Form.Label>Nome do serviço</Form.Label>
+              <Form.Input name="name" />
+              <Form.ErrorMessage field="name" />
+            </Form.Field>
 
-      </form>
-    </FormProvider>
-  );
+            <Form.Field>
+              <Form.Label>Preço</Form.Label>
+              <Form.Input name="price" />
+              <Form.ErrorMessage field="price" />
+            </Form.Field>
+
+
+            <DialogFooter className="mt-2">
+              <Button aria-label="Close" text="Cancelar" color="gray" onClick={handleModalClose} type="button" />
+              <Button text="Cadastrar" type="submit" disabled={isMutating} />
+            </DialogFooter>
+          </form>
+        </FormProvider>
+
+      </DialogContent>
+    </Dialog>
+  )
 }

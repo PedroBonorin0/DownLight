@@ -6,5 +6,5 @@ module.exports = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {},
-  plugins: [require("tailwindcss-radix")()],
+  plugins: [require("tailwindcss-radix"),require("tailwindcss-animate")],
 };

@@ -1,5 +1,4 @@
 "use client";
-import { DeleteModal } from "@/components/DeleteModal";
 import { useQueryService } from "@/hooks/useQueryService";
 import { useServiceStore } from "@/hooks/useServiceStore";
 import { TableLoading } from "./TableLoading";
@@ -14,7 +13,8 @@ import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 import { useState } from "react";
 import { Form } from '@/components/Form'
 import { Icon } from "@/components/Icons";
-import { NoData } from "@/components/NoData";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/Dialog";
+import { Button } from "@/components/Button";
 
 interface Props {
   filter: string
@@ -74,6 +74,7 @@ export function Table({ filter }: Props) {
     mutationKey: ["Service", "Delete"],
     mutationFn: deleteService,
     onMutate: async (id) => {
+      handleModalClose(false)
       await queryClient.cancelQueries({ queryKey: ["services"] });
 
       const previousTodos = queryClient.getQueryData(["services"]);
@@ -144,14 +145,6 @@ export function Table({ filter }: Props) {
   async function handleDeleteAction() {
     mutateDelete(state.serviceToDelete?.id!);
   }
-
-  // if (services?.length === 0) {
-  //   return (
-  //     <NoData title="Nenhum serviço" message="Adicione um serviço para ele aparecer aqui.">
-
-  //     </NoData>
-  //   )
-  // }
 
   return (
     <>
@@ -272,14 +265,24 @@ export function Table({ filter }: Props) {
                 ))
           )}
         </div>
+        <Dialog open={modalOpen} onOpenChange={handleModalClose} modal>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Deletar serviço</DialogTitle>
+              <DialogDescription className="text-base">
+                Tem certeza que deseja deletar o serviço {state.serviceToDelete?.name}?
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter >
+              <Button text="Deletar" color="red" onClick={handleDeleteAction} className="w-full" />
+              <Button aria-label="Close" text="Cancelar" color="gray" className="w-full" onClick={() => handleModalClose(false)} />
+            </DialogFooter>
+
+          </DialogContent>
+        </Dialog>
       </div >
-      <DeleteModal
-        title={"Deletar serviço " + state.serviceToDelete?.name}
-        description="Tem certeza que deseja deletar este serviço?"
-        open={modalOpen}
-        onOpenChange={handleModalClose}
-        deleteAction={handleDeleteAction}
-      />
+
     </>
   );
 }
