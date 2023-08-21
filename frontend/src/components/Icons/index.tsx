@@ -15,6 +15,7 @@ import { Users } from "./Users"
 import { X } from "./X"
 import { ArrowLeft } from "./ArrowLeft"
 import { EmptyFolder } from "./EmptyFolder"
+import { Tag } from "./Tag"
 import { twMerge } from "tailwind-merge"
 
 const CustomIcon = {
@@ -33,7 +34,8 @@ const CustomIcon = {
   Users,
   X,
   ArrowLeft,
-  EmptyFolder
+  EmptyFolder,
+  Tag
 }
 
 

@@ -7,11 +7,13 @@ import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import { z } from "zod";
 import { Form } from "@/components/Form"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/Dialog";
 import { useState } from "react";
+import { toast } from "@/components/use-toast";
+import { ToastAction } from "@/components/Toast";
+import { Icon } from "@/components/Icons";
 
 export function CreateServiceForm() {
   const ServiceSchema = z.object({
@@ -52,11 +54,23 @@ export function CreateServiceForm() {
       return { previousTodos };
     },
     onSuccess: () => {
-      toast.success("Cadastro concluído com sucesso!", { delay: 0 });
+      toast({
+        title: "Sucesso!",
+        description: "Serviço cadastrado",
+        action: (
+          <ToastAction altText="Success!" className="border-0">
+            <Icon icon="Check" className="text-emerald-500" />
+          </ToastAction>
+        )
+      })
     },
     onError: (error: any, _variables, context) => {
       queryClient.setQueryData(["services"], context?.previousTodos);
-      toast.error(error?.data.message ?? "Ocorreu um erro!", { delay: 0 });
+      toast({
+        title: "Erro!",
+        description: error?.data.message ?? "Ocorreu um erro!",
+        variant: "destructive"
+      })
     },
     onSettled: async () => {
       reset();

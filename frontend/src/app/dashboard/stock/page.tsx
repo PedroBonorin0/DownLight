@@ -2,7 +2,6 @@
 
 import { Table } from "./Table";
 import { useQueryProduct } from "@/hooks/useQueryProduct";
-import { ToastContainer } from "react-toastify";
 import { Button } from "@/components/Button";
 import { RefetchButton } from "@/components/RefetchButton";
 import { Icon } from "@/components/Icons";
@@ -48,35 +47,21 @@ export default function Stock() {
           <StockForm />
         </NoData>
         :
-        <>
-          <div className="flex flex-col">
-            <div className="overflow-x-auto">
-              <div className="inline-block w-full align-middle">
-                <div className="w-3/5 flex justify-between">
-                  <FormProvider {...SearchForm}>
-                    <Input name="search" className="w-96" icon="Search" placeholder="Pesquisar" />
-                  </FormProvider>
-                  <Link href={'dashboard/stock/form'}>
-                    <Button text="Novo Produto" type="button" />
-                  </Link>
-                </div>
-                <div className="mt-5 max-h-[660px] w-3/5 overflow-auto">
-                  <Table filter={searchField} />
-                </div>
+        <div className="flex flex-col">
+          <div className="overflow-x-auto">
+            <div className="inline-block w-full align-middle">
+              <div className="w-3/5 flex justify-between">
+                <FormProvider {...SearchForm}>
+                  <Input name="search" className="w-96" icon="Search" placeholder="Pesquisar" />
+                </FormProvider>
+                <StockForm />
+              </div>
+              <div className="mt-5 max-h-[660px] w-3/5 overflow-auto">
+                <Table filter={searchField} />
               </div>
             </div>
           </div>
-          <ToastContainer
-            position="bottom-right"
-            autoClose={3000}
-            hideProgressBar={true}
-            newestOnTop={true}
-            closeOnClick
-            draggable
-            pauseOnHover
-            theme="light"
-          />
-        </>
+        </div>
       }
     </div>
   );

@@ -7,6 +7,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form } from "@/components/Form";
 import { Icon } from "@/components/Icons";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/Popover";
+import { ToastAction } from "@/components/Toast";
+import { toast } from "@/components/use-toast";
+import { useQueryCategory } from "@/hooks/useQueryCategory";
 import { useQueryProduct } from "@/hooks/useQueryProduct";
 import { backend } from "@/lib/axios";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
@@ -15,7 +18,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import { z } from "zod";
 
 export default function StockForm() {
@@ -47,59 +49,9 @@ export default function StockForm() {
 
   const selectedCategories = watch("categories")
 
-  const categorias = [
-    {
-      id: "1",
-      name: "categoria 1"
-    },
-    {
-      id: "2",
-      name: "categoria 2"
-    },
-    {
-      id: "3",
-      name: "categoria 3"
-    },
-    {
-      id: "4",
-      name: "categoria 3"
-    },
-    {
-      id: "5",
-      name: "categoria 3"
-    },
-    {
-      id: "6",
-      name: "categoria 3"
-    },
-    {
-      id: "7",
-      name: "categoria 3"
-    }, {
-      id: "8",
-      name: "categoria 3"
-    },
-    {
-      id: "9",
-      name: "categoria 3"
-    },
-    {
-      id: "10",
-      name: "categoria 3"
-    },
-    {
-      id: "11",
-      name: "categoria 3"
-    },
-    {
-      id: "12",
-      name: "categoria 3"
-    },
-    {
-      id: "13",
-      name: "categoria 3"
-    },
-  ]
+  const { data: categories } = useQueryCategory()
+
+
 
 
 
@@ -125,11 +77,23 @@ export default function StockForm() {
       return { previousTodos };
     },
     onSuccess: () => {
-      toast.success("Cadastro concluído com sucesso!", { delay: 0 });
+      toast({
+        title: "Sucesso!",
+        description: "Produto cadastrado",
+        action: (
+          <ToastAction altText="Success!" className="border-0">
+            <Icon icon="Check" className="text-emerald-500" />
+          </ToastAction>
+        )
+      })
     },
     onError: (error: any, _variables, context) => {
       queryClient.setQueryData(["products"], context?.previousTodos);
-      toast.error(error?.data.message ?? "Ocorreu um erro!", { delay: 0 });
+      toast({
+        title: "Erro!",
+        description: error?.data.message ?? "Ocorreu um erro!",
+        variant: "destructive"
+      })
     },
     onSettled: async () => {
       reset();
@@ -154,6 +118,20 @@ export default function StockForm() {
   function handleModalClose() {
     setModalOpen(false)
   }
+
+  const SearchSchema = z.object({
+    search: z.string()
+  });
+
+  type SearchData = z.infer<typeof SearchSchema>;
+
+  const SearchForm = useForm<SearchData>({
+    resolver: zodResolver(SearchSchema),
+  });
+
+  const searchField = SearchForm.watch("search")
+
+  const filteredCategories = categories?.filter(category => category.name.startsWith(searchField ?? ""))
 
   return (
 
@@ -199,15 +177,21 @@ export default function StockForm() {
                     <PopoverTrigger>
                       <Icon icon="Settings" className="text-gray-800 w-5 h-5 hover:text-gray-600 hover:cursor-pointer" />
                     </PopoverTrigger>
-                    <PopoverContent align="end" className="p-0">
+                    <PopoverContent align="end" className="p-0" >
                       <div className="flex flex-col ">
                         <span className="text-sm font-bold text-gray-800 p-4">
                           Aplique categorias para este produto
                         </span>
+                        <FormProvider {...SearchForm}>
+                          <Form.Field className="px-4">
+                            <Form.Input name="search" icon="Search" placeholder="Pesquisar" />
+                          </Form.Field>
+                        </FormProvider>
+
                         <div className="space-y-3 max-h-56 overflow-scroll p-4">
 
 
-                          {categorias.map(item => (
+                          {filteredCategories?.map(item => (
                             <div className="items-center flex space-x-3" key={item.id}>
                               <Controller
                                 key={item.id}
@@ -240,10 +224,10 @@ export default function StockForm() {
                             </div>
                           ))}
                         </div>
-                        <div className="flex p-4 rounded-sm gap-3 items-center text-gray-600 text-sm hover:bg-gray-100 hover:cursor-pointer">
+                        <Link href={"/dashboard/categories"} className="flex p-4 rounded-sm gap-3 items-center text-gray-600 text-sm hover:bg-gray-100 hover:cursor-pointer">
                           <Icon icon="Pencil" className="w-5 h-5" />
                           Editar categorias
-                        </div>
+                        </Link>
                       </div>
                     </PopoverContent>
                   </Popover>
@@ -257,7 +241,7 @@ export default function StockForm() {
                       <span className="text-gray-500">Nenhuma categoria</span>
                       :
                       selectedCategories.map(category => (
-                        <Badge key={category}>{categorias.find(item => item.id === category)?.name}</Badge>
+                        <Badge key={category}>{categories?.find(item => item.id === category)?.name}</Badge>
                       ))}
                   </div>
                   <Form.ErrorMessage field="categories" />

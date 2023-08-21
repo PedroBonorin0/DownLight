@@ -1,21 +1,19 @@
 "use client";
 
-import { Service } from "@/interfaces/Service";
-import { CreateServiceForm } from "./CreateServiceForm";
+import { Category } from "@/interfaces/Category";
 import { Table } from "./Table";
-import { useQueryService } from "@/hooks/useQueryService";
 import { RefetchButton } from "@/components/RefetchButton";
 import { Input } from "@/components/Form/Input";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { Icon } from "@/components/Icons";
 import { NoData } from "@/components/NoData";
+import { useQueryCategory } from "@/hooks/useQueryCategory";
+import { CreateCategoryForm } from "./CreateCategoryForm";
 
-
-export default function Service() {
-  const { isFetching, isLoading, isRefetching, refetch, data: services } = useQueryService();
+export default function Category() {
+  const { isFetching, isLoading, isRefetching, refetch, data: services } = useQueryCategory();
 
   const loading = isFetching || isLoading || isRefetching;
 
@@ -31,24 +29,19 @@ export default function Service() {
 
   const searchField = SearchForm.watch("search")
 
-  const [modalOpen, setModalOpen] = useState(false)
-
-  function handleModalClose(open: boolean) {
-    setModalOpen(open)
-  }
   return (
     <div>
       <div className="mb-8 flex items-end gap-3">
         <h1 className=" flex items-center gap-5 text-4xl text-gray-700">
-          <Icon icon="DocumentDuplicate" className="h-9 w-9 text-gray-500" />
-          Serviços
+          <Icon icon="Tag" className="h-9 w-9 text-gray-500" />
+          Categorias
         </h1>
         <RefetchButton loading={loading} refetch={refetch} />
       </div>
 
       {services?.length === 0 ?
-        <NoData title="Nenhum serviço" message="Adicione um serviço para ele aparecer aqui.">
-          <CreateServiceForm />
+        <NoData title="Nenhuma categoria" message="Adicione uma categoria para ela aparecer aqui.">
+          <CreateCategoryForm />
         </NoData>
         :
         <div className="flex flex-col">
@@ -61,7 +54,7 @@ export default function Service() {
                   <FormProvider {...SearchForm}>
                     <Input name="search" className="w-96" icon="Search" placeholder="Pesquisar" />
                   </FormProvider>
-                  <CreateServiceForm />
+                  <CreateCategoryForm />
                 </div>
               </div>
 

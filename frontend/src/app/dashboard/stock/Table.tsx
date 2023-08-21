@@ -8,12 +8,13 @@ import { backend } from "@/lib/axios";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Product } from "@/interfaces/Product";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 import { Form } from "@/components/Form";
 import { Icon } from "@/components/Icons";
+import { toast } from "@/components/use-toast";
+import { ToastAction } from "@/components/Toast";
 
 interface Props {
   filter: string
@@ -53,11 +54,23 @@ export function Table({ filter }: Props) {
       return { previousTodos };
     },
     onSuccess: () => {
-      toast.success("Edição concluída com sucesso!", { delay: 0 });
+      toast({
+        title: "Sucesso!",
+        description: "Produto editado",
+        action: (
+          <ToastAction altText="Success!" className="border-0">
+            <Icon icon="Check" className="text-emerald-500" />
+          </ToastAction>
+        )
+      })
     },
     onError: (error: any, _variables, context) => {
       queryClient.setQueryData(["products"], context?.previousTodos);
-      toast.error(error?.data.message ?? "Ocorreu um erro!", { delay: 0 });
+      toast({
+        title: "Erro!",
+        description: error?.data.message ?? "Ocorreu um erro!",
+        variant: "destructive"
+      })
     },
     onSettled: async () => {
       state.clear();
@@ -81,11 +94,23 @@ export function Table({ filter }: Props) {
       return { previousTodos };
     },
     onSuccess: () => {
-      toast.success("Deleção concluída com sucesso!", { delay: 0 });
+      toast({
+        title: "Sucesso!",
+        description: "Produto deletado",
+        action: (
+          <ToastAction altText="Success!" className="border-0">
+            <Icon icon="Check" className="text-emerald-500" />
+          </ToastAction>
+        )
+      })
     },
     onError: (error: any, _variables, context) => {
       queryClient.setQueryData(["products"], context?.previousTodos);
-      toast.error(error?.data.message ?? "Ocorreu um erro!", { delay: 0 });
+      toast({
+        title: "Erro!",
+        description: error?.data.message ?? "Ocorreu um erro!",
+        variant: "destructive"
+      })
     },
     onSettled: async () => {
       state.clear();
@@ -292,8 +317,8 @@ export function Table({ filter }: Props) {
         </div>
       </div >
       <DeleteModal
-        title={"Deletar produto " + state.product?.name}
-        description="Tem certeza que deseja deletar este produto?"
+        title="Deletar produto"
+        description={`Tem certeza que deseja deletar o produto ${productSelected.name}`}
         open={deleteModalOpen}
         onOpenChange={handleModalClose}
         deleteAction={handleDeleteAction}

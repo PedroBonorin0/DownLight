@@ -42,20 +42,19 @@ export function DeleteModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal>
-      <DialogTrigger>Open</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-base">
             {description}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex w-full gap-5">
-          <DialogFooter >
-            <Button text="Deletar" color="red" onClick={deleteAction} className="w-full" />
-            <Button aria-label="Close" text="Cancelar" color="gray" className="w-full" />
-          </DialogFooter>
-        </div>
+
+        <DialogFooter >
+          <Button text="Deletar" color="red" onClick={deleteAction} className="w-full" />
+          <Button aria-label="Close" text="Cancelar" color="gray" className="w-full" onClick={() => onOpenChange(false)} />
+        </DialogFooter>
+
       </DialogContent>
     </Dialog>
   )
