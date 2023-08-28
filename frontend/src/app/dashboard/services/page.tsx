@@ -9,7 +9,6 @@ import { Input } from "@/components/Form/Input";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { Icon } from "@/components/Icons";
 import { NoData } from "@/components/NoData";
 
@@ -31,11 +30,6 @@ export default function Service() {
 
   const searchField = SearchForm.watch("search")
 
-  const [modalOpen, setModalOpen] = useState(false)
-
-  function handleModalClose(open: boolean) {
-    setModalOpen(open)
-  }
   return (
     <div>
       <div className="mb-8 flex items-end gap-3">

@@ -3,7 +3,15 @@
 import { Badge } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { Checkbox } from "@/components/Checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/Dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/Dialog";
 import { Form } from "@/components/Form";
 import { Icon } from "@/components/Icons";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/Popover";
@@ -137,7 +145,7 @@ export default function StockForm() {
 
     <Dialog open={modalOpen} onOpenChange={setModalOpen} modal>
       <DialogTrigger asChild>
-        <Button text="Novo Produto" type="button" />
+        <Button type="button" >Novo Produto</Button>
       </DialogTrigger>
       <DialogContent >
         <DialogHeader>
@@ -177,7 +185,7 @@ export default function StockForm() {
                     <PopoverTrigger>
                       <Icon icon="Settings" className="text-gray-800 w-5 h-5 hover:text-gray-600 hover:cursor-pointer" />
                     </PopoverTrigger>
-                    <PopoverContent align="end" className="p-0" >
+                    <PopoverContent align="end" side="top" className="p-0" >
                       <div className="flex flex-col ">
                         <span className="text-sm font-bold text-gray-800 p-4">
                           Aplique categorias para este produto
@@ -252,8 +260,8 @@ export default function StockForm() {
 
             </div>
             <DialogFooter className="mt-6">
-              <Button aria-label="Close" text="Cancelar" color="gray" onClick={handleModalClose} type="button" />
-              <Button text="Salvar" type="submit" disabled={isMutating} className="mb-2" />
+              <Button aria-label="Close" variant="gray" onClick={handleModalClose} type="button" >Cancelar</Button>
+              <Button type="submit" disabled={isMutating} className="mb-2" >Cadastrar</Button>
             </DialogFooter>
           </form>
         </FormProvider>

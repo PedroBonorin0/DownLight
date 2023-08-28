@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/Button";
+
 import { useQueryService } from "@/hooks/useQueryService";
 import { backend } from "@/lib/axios";
 import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
@@ -14,6 +14,8 @@ import { useState } from "react";
 import { toast } from "@/components/use-toast";
 import { ToastAction } from "@/components/Toast";
 import { Icon } from "@/components/Icons";
+import { Button } from "@/components/Button";
+
 
 export function CreateServiceForm() {
   const ServiceSchema = z.object({
@@ -94,38 +96,11 @@ export function CreateServiceForm() {
   function handleModalClose() {
     setModalOpen(false)
   }
-  // return (
-  //   <FormProvider {...CreateServiceForm}>
-  //     <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-
-  //       <Form.Field>
-  //         <Form.Label>Nome do serviço</Form.Label>
-  //         <Form.Input name="name" />
-  //         <Form.ErrorMessage field="name" />
-  //       </Form.Field>
-
-  //       <Form.Field>
-  //         <Form.Label>Preço</Form.Label>
-  //         <Form.Input name="price" />
-  //         <Form.ErrorMessage field="price" />
-  //       </Form.Field>
-
-
-  //       <div className="flex gap-4 mt-7">
-  //         <Button text="Cancelar" type="button" color="gray" onClick={close} />
-  //         <Button text="Cadastrar" type="submit" disabled={isMutating} />
-  //       </div>
-
-  //     </form>
-  //   </FormProvider>
-  // );
-
-
   return (
 
     <Dialog open={modalOpen} onOpenChange={setModalOpen} modal>
       <DialogTrigger asChild>
-        <Button text="Novo Serviço" type="button" />
+        <Button type="button" >Novo Serviço</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -152,8 +127,8 @@ export function CreateServiceForm() {
 
 
             <DialogFooter className="mt-2">
-              <Button aria-label="Close" text="Cancelar" color="gray" onClick={handleModalClose} type="button" />
-              <Button text="Cadastrar" type="submit" disabled={isMutating} />
+              <Button aria-label="Close" variant="gray" onClick={handleModalClose} type="button" >Cancelar</Button>
+              <Button type="submit" disabled={isMutating} >Cadastrar</Button>
             </DialogFooter>
           </form>
         </FormProvider>

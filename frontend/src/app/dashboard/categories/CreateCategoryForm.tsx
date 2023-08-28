@@ -96,7 +96,7 @@ export function CreateCategoryForm() {
   return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen} modal>
       <DialogTrigger asChild>
-        <Button text="Nova Categoria" type="button" />
+        <Button type="button" >Nova Categoria</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -117,8 +117,8 @@ export function CreateCategoryForm() {
 
 
             <DialogFooter className="mt-2">
-              <Button aria-label="Close" text="Cancelar" color="gray" onClick={handleModalClose} type="button" />
-              <Button text="Cadastrar" type="submit" disabled={isMutating} />
+              <Button aria-label="Close" variant="gray" onClick={handleModalClose} type="button" >Cancelar</Button>
+              <Button type="submit" disabled={isMutating} >Cadastrar</Button>
             </DialogFooter>
           </form>
         </FormProvider>
