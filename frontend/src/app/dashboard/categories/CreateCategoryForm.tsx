@@ -1,54 +1,49 @@
 "use client";
 
+import { Button } from "@/components/Button";
 
-import { useQueryService } from "@/hooks/useQueryService";
 import { backend } from "@/lib/axios";
-import { CurrencyFormatter } from "@/utils/CurrencyFormatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
+//import { toast } from "react-toastify";
 import { z } from "zod";
 import { Form } from "@/components/Form"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/Dialog";
 import { useState } from "react";
-import { toast } from "@/components/use-toast";
-import { ToastAction } from "@/components/Toast";
+import { useQueryCategory } from "@/hooks/useQueryCategory";
+import { useToast } from "@/components/use-toast";
 import { Icon } from "@/components/Icons";
-import { Button } from "@/components/Button";
+import { ToastAction } from "@/components/Toast";
 
-
-export function CreateServiceForm() {
-  const ServiceSchema = z.object({
+export function CreateCategoryForm() {
+  const CategorySchema = z.object({
     name: z.string().min(4, "O nome deve conter no mínimo 4 letras"),
-    price: z.coerce
-      .number({ invalid_type_error: "Valor deve ser um número" })
-      .nonnegative("Valor não pode ser negativo")
-      .default(0)
   });
 
-  type ServiceData = z.infer<typeof ServiceSchema>;
+  type CategoryData = z.infer<typeof CategorySchema>;
 
-  const CreateServiceForm = useForm<ServiceData>({
-    resolver: zodResolver(ServiceSchema),
+  const CreateCategoryForm = useForm<CategoryData>({
+    resolver: zodResolver(CategorySchema),
   });
 
-  const { reset, handleSubmit } = CreateServiceForm;
+  const { reset, handleSubmit } = CreateCategoryForm;
 
   const queryClient = useQueryClient();
-  const { refetch } = useQueryService();
+  const { refetch } = useQueryCategory();
+
   const { mutate, isLoading: isMutating } = useMutation({
-    mutationKey: ["Service", "Create"],
-    mutationFn: createService,
-    onMutate: async (newService) => {
-      await queryClient.cancelQueries({ queryKey: ["services"] });
+    mutationKey: ["Category", "Create"],
+    mutationFn: createCategory,
+    onMutate: async (newCategory) => {
+      await queryClient.cancelQueries({ queryKey: ["categories"] });
 
-      const previousTodos = queryClient.getQueryData(["services"]);
+      const previousTodos = queryClient.getQueryData(["categories"]);
 
-      queryClient.setQueryData(["services"], (old: any) => [
+      queryClient.setQueryData(["categories"], (old: any) => [
         {
-          ...newService,
+          name: newCategory.name,
           id: "new",
-          formattedPrice: CurrencyFormatter.format(Number(newService.price)),
         },
         ...old,
       ]);
@@ -58,7 +53,7 @@ export function CreateServiceForm() {
     onSuccess: () => {
       toast({
         title: "Sucesso!",
-        description: "Serviço cadastrado",
+        description: "Categoria cadastrada",
         action: (
           <ToastAction altText="Success!" className="border-0">
             <Icon icon="Check" className="text-emerald-500" />
@@ -67,7 +62,7 @@ export function CreateServiceForm() {
       })
     },
     onError: (error: any, _variables, context) => {
-      queryClient.setQueryData(["services"], context?.previousTodos);
+      queryClient.setQueryData(["categories"], context?.previousTodos);
       toast({
         title: "Erro!",
         description: error?.data.message ?? "Ocorreu um erro!",
@@ -80,14 +75,13 @@ export function CreateServiceForm() {
     },
   });
 
-  async function createService(data: ServiceData) {
-    await backend.post("/services", {
+  async function createCategory(data: CategoryData) {
+    await backend.post("/categories", {
       name: data.name,
-      price: Number(data.price),
     });
   }
 
-  async function onSubmit(data: ServiceData) {
+  async function onSubmit(data: CategoryData) {
     mutate(data);
     handleModalClose();
   }
@@ -96,33 +90,29 @@ export function CreateServiceForm() {
   function handleModalClose() {
     setModalOpen(false)
   }
-  return (
 
+  const { toast } = useToast()
+
+  return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen} modal>
       <DialogTrigger asChild>
-        <Button type="button" >Novo Serviço</Button>
+        <Button type="button" >Nova Categoria</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Criar serviço</DialogTitle>
+          <DialogTitle>Criar categoria</DialogTitle>
           <DialogDescription >
-            Adicione um novo serviço para oferecer a seus clientes.
+            Adicione uma nova categoria para organizar seus produtos.
           </DialogDescription>
         </DialogHeader>
 
-        <FormProvider {...CreateServiceForm}>
+        <FormProvider {...CreateCategoryForm}>
           <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
 
             <Form.Field>
-              <Form.Label>Nome do serviço</Form.Label>
+              <Form.Label>Nome da categoria</Form.Label>
               <Form.Input name="name" />
               <Form.ErrorMessage field="name" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label>Preço</Form.Label>
-              <Form.Input name="price" />
-              <Form.ErrorMessage field="price" />
             </Form.Field>
 
 

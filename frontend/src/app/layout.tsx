@@ -1,8 +1,8 @@
 import QueryProvider from "@/components/QueryProvider";
 import AuthProvider from "../components/AuthProvider";
-import "./globals.css";
-import "react-toastify/dist/ReactToastify.css";
 import { Roboto } from "next/font/google";
+import { Toaster } from "@/components/Toaster";
+import "./globals.css";
 
 const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
 
@@ -21,6 +21,7 @@ export default function RootLayout({
       <body className={`${roboto.className} flex h-screen flex-col bg-gray-50`}>
         <AuthProvider>
           <QueryProvider>{children}</QueryProvider>
+          <Toaster />
         </AuthProvider>
       </body>
     </html>

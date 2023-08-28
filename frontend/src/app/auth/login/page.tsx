@@ -1,6 +1,6 @@
 "use client";
 import { signOut } from "next-auth/react";
-import { Form } from "./Form";
+import { LoginForm } from "./LoginForm";
 
 interface Props {
   searchParams?: {
@@ -37,7 +37,7 @@ export default function Login({ searchParams }: Props) {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-xs">
-        <Form />
+        <LoginForm />
         <div className="mt-10 text-sm">
           <a
             href="#"

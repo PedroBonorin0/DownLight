@@ -1,18 +1,19 @@
 "use client";
 
+import { Category } from "@/interfaces/Category";
 import { Table } from "./Table";
-import { useQueryProduct } from "@/hooks/useQueryProduct";
 import { RefetchButton } from "@/components/RefetchButton";
-import { Icon } from "@/components/Icons";
-import { FormProvider, useForm } from "react-hook-form";
 import { Input } from "@/components/Form/Input";
+import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Icon } from "@/components/Icons";
 import { NoData } from "@/components/NoData";
-import StockForm from "./StockForm";
+import { useQueryCategory } from "@/hooks/useQueryCategory";
+import { CreateCategoryForm } from "./CreateCategoryForm";
 
-export default function Stock() {
-  const { isFetching, isLoading, isRefetching, refetch, data: products } = useQueryProduct();
+export default function Category() {
+  const { isFetching, isLoading, isRefetching, refetch, data: services } = useQueryCategory();
 
   const loading = isFetching || isLoading || isRefetching;
 
@@ -32,28 +33,35 @@ export default function Stock() {
     <div>
       <div className="mb-8 flex items-end gap-3">
         <h1 className=" flex items-center gap-5 text-4xl text-gray-700">
-          <Icon icon="Stack" className="h-9 w-9 text-gray-500" />
-          Estoque
+          <Icon icon="Tag" className="h-9 w-9 text-gray-500" />
+          Categorias
         </h1>
         <RefetchButton loading={loading} refetch={refetch} />
       </div>
-      {products?.length === 0 ?
-        <NoData title="Nenhum produto" message="Adicione um produto para ele aparecer aqui.">
-          <StockForm />
+
+      {services?.length === 0 ?
+        <NoData title="Nenhuma categoria" message="Adicione uma categoria para ela aparecer aqui.">
+          <CreateCategoryForm />
         </NoData>
         :
         <div className="flex flex-col">
           <div className="overflow-x-auto">
             <div className="inline-block w-full align-middle">
-              <div className="w-3/5 flex justify-between">
-                <FormProvider {...SearchForm}>
-                  <Input name="search" className="w-96" icon="Search" placeholder="Pesquisar" />
-                </FormProvider>
-                <StockForm />
+
+              <div className="w-3/5">
+
+                <div className="flex justify-between">
+                  <FormProvider {...SearchForm}>
+                    <Input name="search" className="w-96" icon="Search" placeholder="Pesquisar" />
+                  </FormProvider>
+                  <CreateCategoryForm />
+                </div>
               </div>
-              <div className="mt-5 max-h-[660px] w-3/5 overflow-auto">
+
+              <div className="mt-6 max-h-[660px] w-3/5 overflow-auto">
                 <Table filter={searchField} />
               </div>
+
             </div>
           </div>
         </div>
