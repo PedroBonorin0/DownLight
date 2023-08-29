@@ -16,7 +16,8 @@ import { X } from "./X"
 import { ArrowLeft } from "./ArrowLeft"
 import { EmptyFolder } from "./EmptyFolder"
 import { Tag } from "./Tag"
-import { CircleNotch } from "./Circle-notch"
+import { CircleNotch } from "./CircleNotch"
+import { ChevronLeft } from "./ChevronLeft"
 import { twMerge } from "tailwind-merge"
 
 const CustomIcon = {
@@ -37,7 +38,8 @@ const CustomIcon = {
   ArrowLeft,
   EmptyFolder,
   Tag,
-  CircleNotch
+  CircleNotch,
+  ChevronLeft
 }
 
 
@@ -46,7 +48,8 @@ export type IconProps = keyof typeof CustomIcon
 interface Props {
   icon: IconProps
   className?: string
+  onClick?: () => void
 }
-export function Icon({ icon, className }: Props) {
+export function Icon({ icon, className, onClick }: Props) {
   return createElement(CustomIcon[icon], { className: twMerge("w-6 h-6", className) })
 }
