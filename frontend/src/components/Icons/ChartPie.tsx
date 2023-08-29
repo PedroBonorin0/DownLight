@@ -1,4 +1,7 @@
-export function ChartPie() {
+interface Props {
+  className?: string
+}
+export function ChartPie({ className }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -6,7 +9,7 @@ export function ChartPie() {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className="h-6 w-6"
+      className={className}
     >
       <path
         strokeLinecap="round"

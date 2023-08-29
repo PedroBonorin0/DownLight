@@ -232,7 +232,7 @@ export function Table({ filter }: Props) {
                         {/* <Button text="Salvar" color="green" onClick={handleSubmit(onSubmit)} disabled={isEditing} /> */}
 
                         <button
-                          className="cursor-pointer text-gray-500 hover:text-gray-600"
+                          className="cursor-pointer text-gray-500 hover:text-gray-600 "
                           type="button"
                           onClick={() => {
                             state.clear();

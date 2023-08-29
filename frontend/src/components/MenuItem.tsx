@@ -13,16 +13,16 @@ export function MenuItem({ icon, title, href }: Props) {
   return (
     <Link
       href={href}
-      className={`group flex items-center rounded-lg p-2  ${pathName === href ? "text-blue-600" : "text-gray-700 "
+      className={`group flex items-center rounded-lg py-2  ${pathName === href ? "text-blue-600" : "text-gray-700 "
         } hover:bg-gray-100 hover:text-blue-600`}
     >
       <div
         className={`${pathName === href ? "text-blue-600" : "text-gray-700 font-bold"
           } group-hover:text-blue-600`}
       >
-        <Icon icon={icon} />
+        <Icon icon={icon} className="w-8 h-8" />
       </div>
-      <span className="ml-3">{title}</span>
+      <span className="ml-3 text-lg">{title}</span>
     </Link>
   );
 }
